@@ -30,12 +30,11 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
     private float[] projectionMatrix = new float[16];
     private float[] modelViewProjectionMatrix = new float[16];
 
-    //буфер для координат вершин
-    private final FloatBuffer mSeaVerticesBuffer;
-    private final FloatBuffer mSkyVerticesBuffer;
-    private final FloatBuffer mMainSailVerticesBuffer;
-    private final FloatBuffer mSmallSailVerticesBuffer;
-    private final FloatBuffer mBoatVerticesBuffer;
+    private FloatBuffer mSeaVerticesBuffer;
+    private FloatBuffer mSkyVerticesBuffer;
+    private FloatBuffer mMainSailVerticesBuffer;
+    private FloatBuffer mSmallSailVerticesBuffer;
+    private FloatBuffer mBoatVerticesBuffer;
 
     //буфер для нормалей вершин
     private FloatBuffer normalBuffer;
@@ -64,95 +63,9 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         yLightPosition = 0.2f;
         zLightPosition = 0.5f;
 
+        setupModelViewMatrix();
 
-        //мы не будем двигать объекты поэтому сбрасываем модельную матрицу на единичную
-        Matrix.setIdentityM(modelMatrix, 0);
-
-        //координаты камеры
-        xСamera = 0.0f;
-        yCamera = 0.0f;
-        zCamera = 3.0f;
-
-        // пусть камера смотрит на начало координат
-        // и верх у камеры будет вдоль оси Y
-        // зная координаты камеры получаем матрицу вида
-        Matrix.setLookAtM(
-                viewMatrix, 0, xСamera, yCamera, zCamera,
-                0, 0, 0, 0, 1, 0);
-        // умножая матрицу вида на матрицу модели
-        // получаем матрицу модели-вида
-        Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
-
-        float seaVertices[] = {
-                -1.0f, -0.35f, 0.0f,
-                -1.0f, -1.5f, 0.0f,
-                1.0f, -0.35f, 0.0f,
-                1.0f, -1.5f, 0.0f
-        };
-        float skyVertices[] = {
-                -1.0f, 1.5f, 0.0f,
-                -1.0f, -0.35f, 0.0f,
-                1.0f, 1.5f, 0.0f,
-                1.0f, -0.35f, 0
-        };
-        float mainSailVertices[] = {
-                -0.5f, -0.45f, 0.4f,
-                0.0f, -0.45f, 0.4f,
-                0.0f, 0.5f, 0.4f
-        };
-        float smallSailVertices[] = {
-                0.05f, -0.45f, 0.4f,
-                0.22f, -0.5f, 0.4f,
-                0.0f, 0.25f, 0.4f
-        };
-        float boatVertices[] = {
-                -0.5f, -0.5f, 0.4f,
-                -0.5f, -0.6f, 0.4f,
-                0.22f, -0.5f, 0.4f,
-                0.18f, -0.6f, 0.4f
-        };
-
-        //создадим буфер для хранения координат вершин
-        ByteBuffer seaVerticesBuffer = ByteBuffer.allocateDirect(seaVertices.length * 4);
-        seaVerticesBuffer.order(ByteOrder.nativeOrder());
-        mSeaVerticesBuffer = seaVerticesBuffer.asFloatBuffer();
-        mSeaVerticesBuffer.position(0);
-
-        ByteBuffer skyVerticesBuffer = ByteBuffer.allocateDirect(skyVertices.length * 4);
-        skyVerticesBuffer.order(ByteOrder.nativeOrder());
-        mSkyVerticesBuffer = skyVerticesBuffer.asFloatBuffer();
-        mSkyVerticesBuffer.position(0);
-
-        ByteBuffer mainSailVerticesBuffer = ByteBuffer.allocateDirect(mainSailVertices.length * 4);
-        mainSailVerticesBuffer.order(ByteOrder.nativeOrder());
-        mMainSailVerticesBuffer = mainSailVerticesBuffer.asFloatBuffer();
-        mMainSailVerticesBuffer.position(0);
-
-        ByteBuffer smallSailVerticesBuffer = ByteBuffer.allocateDirect(smallSailVertices.length * 4);
-        smallSailVerticesBuffer.order(ByteOrder.nativeOrder());
-        this.mSmallSailVerticesBuffer = smallSailVerticesBuffer.asFloatBuffer();
-        this.mSmallSailVerticesBuffer.position(0);
-
-        ByteBuffer boatVerticesBuffer = ByteBuffer.allocateDirect(boatVertices.length * 4);
-        boatVerticesBuffer.order(ByteOrder.nativeOrder());
-        mBoatVerticesBuffer = boatVerticesBuffer.asFloatBuffer();
-        mBoatVerticesBuffer.position(0);
-
-        mSeaVerticesBuffer.put(seaVertices);
-        mSeaVerticesBuffer.position(0);
-
-        mSkyVerticesBuffer.put(skyVertices);
-        mSkyVerticesBuffer.position(0);
-
-        mMainSailVerticesBuffer.put(mainSailVertices);
-        mMainSailVerticesBuffer.position(0);
-
-        mSmallSailVerticesBuffer.put(smallSailVertices);
-        mSmallSailVerticesBuffer.position(0);
-
-        mBoatVerticesBuffer.put(boatVertices);
-        mBoatVerticesBuffer.position(0);
-
+        setupVertexBuffers();
 
         //вектор нормали перпендикулярен плоскости квадрата
         //и направлен вдоль оси Z
@@ -248,6 +161,97 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
 
     }
 
+    private void setupModelViewMatrix() {
+        //мы не будем двигать объекты поэтому сбрасываем модельную матрицу на единичную
+        Matrix.setIdentityM(modelMatrix, 0);
+
+        //координаты камеры
+        xСamera = 0.0f;
+        yCamera = 0.0f;
+        zCamera = 3.0f;
+
+        // пусть камера смотрит на начало координат
+        // и верх у камеры будет вдоль оси Y
+        // зная координаты камеры получаем матрицу вида
+        Matrix.setLookAtM(
+                viewMatrix, 0, xСamera, yCamera, zCamera,
+                0, 0, 0, 0, 1, 0);
+        // умножая матрицу вида на матрицу модели
+        // получаем матрицу модели-вида
+        Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+    }
+
+    private void setupVertexBuffers() {
+        float seaVertices[] = {
+                -1.0f, -0.35f, 0.0f,
+                -1.0f, -1.5f, 0.0f,
+                1.0f, -0.35f, 0.0f,
+                1.0f, -1.5f, 0.0f
+        };
+        float skyVertices[] = {
+                -1.0f, 1.5f, 0.0f,
+                -1.0f, -0.35f, 0.0f,
+                1.0f, 1.5f, 0.0f,
+                1.0f, -0.35f, 0
+        };
+        float mainSailVertices[] = {
+                -0.5f, -0.45f, 0.4f,
+                0.0f, -0.45f, 0.4f,
+                0.0f, 0.5f, 0.4f
+        };
+        float smallSailVertices[] = {
+                0.05f, -0.45f, 0.4f,
+                0.22f, -0.5f, 0.4f,
+                0.0f, 0.25f, 0.4f
+        };
+        float boatVertices[] = {
+                -0.5f, -0.5f, 0.4f,
+                -0.5f, -0.6f, 0.4f,
+                0.22f, -0.5f, 0.4f,
+                0.18f, -0.6f, 0.4f
+        };
+
+        //создадим буфер для хранения координат вершин
+        ByteBuffer seaVerticesBuffer = ByteBuffer.allocateDirect(seaVertices.length * 4);
+        seaVerticesBuffer.order(ByteOrder.nativeOrder());
+        mSeaVerticesBuffer = seaVerticesBuffer.asFloatBuffer();
+        mSeaVerticesBuffer.position(0);
+
+        ByteBuffer skyVerticesBuffer = ByteBuffer.allocateDirect(skyVertices.length * 4);
+        skyVerticesBuffer.order(ByteOrder.nativeOrder());
+        mSkyVerticesBuffer = skyVerticesBuffer.asFloatBuffer();
+        mSkyVerticesBuffer.position(0);
+
+        ByteBuffer mainSailVerticesBuffer = ByteBuffer.allocateDirect(mainSailVertices.length * 4);
+        mainSailVerticesBuffer.order(ByteOrder.nativeOrder());
+        mMainSailVerticesBuffer = mainSailVerticesBuffer.asFloatBuffer();
+        mMainSailVerticesBuffer.position(0);
+
+        ByteBuffer smallSailVerticesBuffer = ByteBuffer.allocateDirect(smallSailVertices.length * 4);
+        smallSailVerticesBuffer.order(ByteOrder.nativeOrder());
+        this.mSmallSailVerticesBuffer = smallSailVerticesBuffer.asFloatBuffer();
+        this.mSmallSailVerticesBuffer.position(0);
+
+        ByteBuffer boatVerticesBuffer = ByteBuffer.allocateDirect(boatVertices.length * 4);
+        boatVerticesBuffer.order(ByteOrder.nativeOrder());
+        mBoatVerticesBuffer = boatVerticesBuffer.asFloatBuffer();
+        mBoatVerticesBuffer.position(0);
+
+        mSeaVerticesBuffer.put(seaVertices);
+        mSeaVerticesBuffer.position(0);
+
+        mSkyVerticesBuffer.put(skyVertices);
+        mSkyVerticesBuffer.position(0);
+
+        mMainSailVerticesBuffer.put(mainSailVertices);
+        mMainSailVerticesBuffer.position(0);
+
+        mSmallSailVerticesBuffer.put(smallSailVertices);
+        mSmallSailVerticesBuffer.position(0);
+
+        mBoatVerticesBuffer.put(boatVertices);
+        mBoatVerticesBuffer.position(0);
+    }
 
     //метод, который срабатывает при изменении размеров экрана
     //в нем мы получим матрицу проекции и матрицу модели-вида-проекции
