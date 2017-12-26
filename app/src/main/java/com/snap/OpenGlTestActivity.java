@@ -10,7 +10,7 @@ import android.os.Bundle;
 
 import com.snap.lighting.SceneLightRenderer;
 
-public class MainActivity extends AppCompatActivity {
+public class OpenGlTestActivity extends AppCompatActivity {
 
     private GLSurfaceView glSurfaceView;
     private boolean isRendererSet;

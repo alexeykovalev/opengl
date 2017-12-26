@@ -77,7 +77,8 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         // и верх у камеры будет вдоль оси Y
         // зная координаты камеры получаем матрицу вида
         Matrix.setLookAtM(
-                viewMatrix, 0, xСamera, yCamera, zCamera, 0, 0, 0, 0, 1, 0);
+                viewMatrix, 0, xСamera, yCamera, zCamera,
+                0, 0, 0, 0, 1, 0);
         // умножая матрицу вида на матрицу модели
         // получаем матрицу модели-вида
         Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
