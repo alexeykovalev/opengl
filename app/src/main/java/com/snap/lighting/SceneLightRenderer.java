@@ -31,11 +31,11 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
     private float[] modelViewProjectionMatrix = new float[16];
 
     //буфер для координат вершин
-    private final FloatBuffer vertexBuffer;
-    private final FloatBuffer vertexBuffer1;
-    private final FloatBuffer vertexBuffer2;
-    private final FloatBuffer vertexBuffer3;
-    private final FloatBuffer vertexBuffer4;
+    private final FloatBuffer mSeaVerticesBuffer;
+    private final FloatBuffer mSkyVerticesBuffer;
+    private final FloatBuffer mMainSailVerticesBuffer;
+    private final FloatBuffer mSmallSailVerticesBuffer;
+    private final FloatBuffer mBoatVerticesBuffer;
 
     //буфер для нормалей вершин
     private FloatBuffer normalBuffer;
@@ -83,70 +83,77 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         // получаем матрицу модели-вида
         Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
 
-        //координаты вершины 1
-        float x1 = -1;
-        float y1 = -0.35f;
-        float z1 = 0.0f;
-        //координаты вершины 2
-        float x2 = -1;
-        float y2 = -1.5f;
-        float z2 = 0.0f;
-        //координаты вершины 3
-        float x3 = 1;
-        float y3 = -0.35f;
-        float z3 = 0.0f;
-        //координаты вершины 4
-        float x4 = 1;
-        float y4 = -1.5f;
-        float z4 = 0.0f;
-        //запишем координаты всех вершин в единый массив
-        float vertexArray[] = {x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4};
-        //coordinates for sky
-        float vertexArray1[] = {-1.0f, 1.5f, 0.0f, -1.0f, -0.35f, 0.0f, 1.0f, 1.5f, 0.0f, 1.0f, -0.35f, 0};
-        //coordinates for main sail
-        float vertexArray2[] = {-0.5f, -0.45f, 0.4f, 0.0f, -0.45f, 0.4f, 0.0f, 0.5f, 0.4f};
-        //coordinates for small sail
-        float vertexArray3[] = {0.05f, -0.45f, 0.4f, 0.22f, -0.5f, 0.4f, 0.0f, 0.25f, 0.4f};
-        //coordinates for boat
-        float vertexArray4[] = {-0.5f, -0.5f, 0.4f, -0.5f, -0.6f, 0.4f, 0.22f, -0.5f, 0.4f, 0.18f, -0.6f, 0.4f};
+        float seaVertices[] = {
+                -1.0f, -0.35f, 0.0f,
+                -1.0f, -1.5f, 0.0f,
+                1.0f, -0.35f, 0.0f,
+                1.0f, -1.5f, 0.0f
+        };
+        float skyVertices[] = {
+                -1.0f, 1.5f, 0.0f,
+                -1.0f, -0.35f, 0.0f,
+                1.0f, 1.5f, 0.0f,
+                1.0f, -0.35f, 0
+        };
+        float mainSailVertices[] = {
+                -0.5f, -0.45f, 0.4f,
+                0.0f, -0.45f, 0.4f,
+                0.0f, 0.5f, 0.4f
+        };
+        float smallSailVertices[] = {
+                0.05f, -0.45f, 0.4f,
+                0.22f, -0.5f, 0.4f,
+                0.0f, 0.25f, 0.4f
+        };
+        float boatVertices[] = {
+                -0.5f, -0.5f, 0.4f,
+                -0.5f, -0.6f, 0.4f,
+                0.22f, -0.5f, 0.4f,
+                0.18f, -0.6f, 0.4f
+        };
 
         //создадим буфер для хранения координат вершин
-        ByteBuffer bvertex = ByteBuffer.allocateDirect(vertexArray.length * 4);
-        bvertex.order(ByteOrder.nativeOrder());
-        vertexBuffer = bvertex.asFloatBuffer();
-        vertexBuffer.position(0);
+        ByteBuffer seaVerticesBuffer = ByteBuffer.allocateDirect(seaVertices.length * 4);
+        seaVerticesBuffer.order(ByteOrder.nativeOrder());
+        mSeaVerticesBuffer = seaVerticesBuffer.asFloatBuffer();
+        mSeaVerticesBuffer.position(0);
 
-        ByteBuffer bvertex1 = ByteBuffer.allocateDirect(vertexArray1.length * 4);
-        bvertex1.order(ByteOrder.nativeOrder());
-        vertexBuffer1 = bvertex1.asFloatBuffer();
-        vertexBuffer1.position(0);
+        ByteBuffer skyVerticesBuffer = ByteBuffer.allocateDirect(skyVertices.length * 4);
+        skyVerticesBuffer.order(ByteOrder.nativeOrder());
+        mSkyVerticesBuffer = skyVerticesBuffer.asFloatBuffer();
+        mSkyVerticesBuffer.position(0);
 
-        ByteBuffer bvertex2 = ByteBuffer.allocateDirect(vertexArray2.length * 4);
-        bvertex2.order(ByteOrder.nativeOrder());
-        vertexBuffer2 = bvertex2.asFloatBuffer();
-        vertexBuffer2.position(0);
+        ByteBuffer mainSailVerticesBuffer = ByteBuffer.allocateDirect(mainSailVertices.length * 4);
+        mainSailVerticesBuffer.order(ByteOrder.nativeOrder());
+        mMainSailVerticesBuffer = mainSailVerticesBuffer.asFloatBuffer();
+        mMainSailVerticesBuffer.position(0);
 
-        ByteBuffer bvertex3 = ByteBuffer.allocateDirect(vertexArray3.length * 4);
-        bvertex3.order(ByteOrder.nativeOrder());
-        vertexBuffer3 = bvertex3.asFloatBuffer();
-        vertexBuffer3.position(0);
+        ByteBuffer smallSailVerticesBuffer = ByteBuffer.allocateDirect(smallSailVertices.length * 4);
+        smallSailVerticesBuffer.order(ByteOrder.nativeOrder());
+        this.mSmallSailVerticesBuffer = smallSailVerticesBuffer.asFloatBuffer();
+        this.mSmallSailVerticesBuffer.position(0);
 
-        ByteBuffer bvertex4 = ByteBuffer.allocateDirect(vertexArray4.length * 4);
-        bvertex4.order(ByteOrder.nativeOrder());
-        vertexBuffer4 = bvertex4.asFloatBuffer();
-        vertexBuffer4.position(0);
+        ByteBuffer boatVerticesBuffer = ByteBuffer.allocateDirect(boatVertices.length * 4);
+        boatVerticesBuffer.order(ByteOrder.nativeOrder());
+        mBoatVerticesBuffer = boatVerticesBuffer.asFloatBuffer();
+        mBoatVerticesBuffer.position(0);
 
-        //перепишем координаты вершин из массива в буфер
-        vertexBuffer.put(vertexArray);
-        vertexBuffer.position(0);
-        vertexBuffer1.put(vertexArray1);
-        vertexBuffer1.position(0);
-        vertexBuffer2.put(vertexArray2);
-        vertexBuffer2.position(0);
-        vertexBuffer3.put(vertexArray3);
-        vertexBuffer3.position(0);
-        vertexBuffer4.put(vertexArray4);
-        vertexBuffer4.position(0);
+        mSeaVerticesBuffer.put(seaVertices);
+        mSeaVerticesBuffer.position(0);
+
+        mSkyVerticesBuffer.put(skyVertices);
+        mSkyVerticesBuffer.position(0);
+
+        mMainSailVerticesBuffer.put(mainSailVertices);
+        mMainSailVerticesBuffer.position(0);
+
+        mSmallSailVerticesBuffer.put(smallSailVertices);
+        mSmallSailVerticesBuffer.position(0);
+
+        mBoatVerticesBuffer.put(boatVertices);
+        mBoatVerticesBuffer.position(0);
+
+
         //вектор нормали перпендикулярен плоскости квадрата
         //и направлен вдоль оси Z
         float nx = 0;
@@ -314,7 +321,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         //создадим шейдерный объект
         mShader = new Shader(vertexShaderCode, fragmentShaderCode);
         //свяжем буфер вершин с атрибутом a_vertex в вершинном шейдере
-        mShader.linkVertexBuffer(vertexBuffer);
+        mShader.linkVertexBuffer(mSeaVerticesBuffer);
         //свяжем буфер нормалей с атрибутом a_normal в вершинном шейдере
         mShader.linkNormalBuffer(normalBuffer);
         //свяжем буфер цветов с атрибутом a_color в вершинном шейдере
@@ -323,22 +330,22 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         //пока не будет уничтожен шейдерный объект
 
         mShader1 = new Shader(vertexShaderCode, fragmentShaderCode);
-        mShader1.linkVertexBuffer(vertexBuffer1);
+        mShader1.linkVertexBuffer(mSkyVerticesBuffer);
         mShader1.linkNormalBuffer(normalBuffer);
         mShader1.linkColorBuffer(colorBuffer1);
 
         mShader2 = new Shader(vertexShaderCode, fragmentShaderCode);
-        mShader2.linkVertexBuffer(vertexBuffer2);
+        mShader2.linkVertexBuffer(mMainSailVerticesBuffer);
         mShader2.linkNormalBuffer(normalBuffer);
         mShader2.linkColorBuffer(colorBuffer2);
 
         mShader3 = new Shader(vertexShaderCode, fragmentShaderCode);
-        mShader3.linkVertexBuffer(vertexBuffer3);
+        mShader3.linkVertexBuffer(mSmallSailVerticesBuffer);
         mShader3.linkNormalBuffer(normalBuffer);
         mShader3.linkColorBuffer(colorBuffer2);
 
         mShader4 = new Shader(vertexShaderCode, fragmentShaderCode);
-        mShader4.linkVertexBuffer(vertexBuffer4);
+        mShader4.linkVertexBuffer(mBoatVerticesBuffer);
         mShader4.linkNormalBuffer(normalBuffer);
         mShader4.linkColorBuffer(colorBuffer4);
 
@@ -351,7 +358,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
 
         //передаем в шейдерный объект матрицу модели-вида-проекции
         mShader.useProgram();
-        mShader.linkVertexBuffer(vertexBuffer);
+        mShader.linkVertexBuffer(mSeaVerticesBuffer);
         mShader.linkColorBuffer(colorBuffer);
         mShader.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
         mShader.linkCamera(xСamera, yCamera, zCamera);
@@ -359,7 +366,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
         mShader1.useProgram();
-        mShader1.linkVertexBuffer(vertexBuffer1);
+        mShader1.linkVertexBuffer(mSkyVerticesBuffer);
         mShader1.linkColorBuffer(colorBuffer1);
         mShader1.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
         mShader1.linkCamera(xСamera, yCamera, zCamera);
@@ -367,7 +374,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
         mShader2.useProgram();
-        mShader2.linkVertexBuffer(vertexBuffer2);
+        mShader2.linkVertexBuffer(mMainSailVerticesBuffer);
         mShader2.linkColorBuffer(colorBuffer2);
         mShader2.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
         mShader2.linkCamera(xСamera, yCamera, zCamera);
@@ -375,7 +382,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
 
         mShader3.useProgram();
-        mShader3.linkVertexBuffer(vertexBuffer3);
+        mShader3.linkVertexBuffer(mSmallSailVerticesBuffer);
         mShader3.linkColorBuffer(colorBuffer2);
         mShader3.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
         mShader3.linkCamera(xСamera, yCamera, zCamera);
@@ -383,7 +390,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
 
         mShader4.useProgram();
-        mShader4.linkVertexBuffer(vertexBuffer4);
+        mShader4.linkVertexBuffer(mBoatVerticesBuffer);
         mShader4.linkColorBuffer(colorBuffer4);
         mShader4.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
         mShader4.linkCamera(xСamera, yCamera, zCamera);
