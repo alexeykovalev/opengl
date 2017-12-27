@@ -193,29 +193,29 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         return result;
     }
 
-    //метод, который срабатывает при изменении размеров экрана
-    //в нем мы получим матрицу проекции и матрицу модели-вида-проекции
+    /**
+     * Here we are going to setup Projection and Model-View-Projection matrices.
+     */
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         // устанавливаем glViewport
         GLES20.glViewport(0, 0, width, height);
+
         float ratio = (float) width / height;
-        float k = 0.055f;
+        float k = 0.047f;
         float left = -k * ratio;
         float right = k * ratio;
         float bottom = -k;
         float top = k;
         float near = 0.1f;
         float far = 10.0f;
-        // получаем матрицу проекции
+
         Matrix.frustumM(projectionMatrix, 0, left, right, bottom, top, near, far);
-        // матрица проекции изменилась,
-        // поэтому нужно пересчитать матрицу модели-вида-проекции
-        Matrix.multiplyMM(
-                modelViewProjectionMatrix, 0, projectionMatrix, 0, modelViewMatrix, 0);
+        Matrix.multiplyMM(modelViewProjectionMatrix,
+                0, projectionMatrix,
+                0, modelViewMatrix,
+                0);
     }
 
-    //метод, который срабатывает при создании экрана
-    //здесь мы создаем шейдерный объект
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         //включаем тест глубины
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
