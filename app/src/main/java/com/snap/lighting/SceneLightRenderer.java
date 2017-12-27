@@ -1,6 +1,5 @@
 package com.snap.lighting;
 
-import android.content.Context;
 //import android.opengl.EGLConfig;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
@@ -15,7 +14,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 
 public class SceneLightRenderer implements GLSurfaceView.Renderer {
 
-    private Context context;
+    private static final int BYTES_PER_FLOAT = 4;
 
     //координаты камеры
     private float xСamera, yCamera, zCamera;
@@ -37,13 +36,13 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
     private FloatBuffer mBoatVerticesBuffer;
 
     //буфер для нормалей вершин
-    private FloatBuffer normalBuffer;
+    private FloatBuffer verticesNormalsBuffer;
 
     //буфер для цветов вершин
-    private final FloatBuffer colorBuffer;
-    private final FloatBuffer colorBuffer1;
-    private final FloatBuffer colorBuffer2;
-    private final FloatBuffer colorBuffer4;
+    private FloatBuffer colorBuffer;
+    private FloatBuffer colorBuffer1;
+    private FloatBuffer colorBuffer2;
+    private FloatBuffer colorBuffer3;
 
     //шейдерный объект
     private Shader mShader;
@@ -53,62 +52,26 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
     private Shader mShader4;
 
 
-    public SceneLightRenderer(Context context) {
-        // запомним контекст
-        // он нам понадобится в будущем для загрузки текстур
-        this.context = context;
+    public SceneLightRenderer() {
+        setup();
+    }
 
-        //координаты точечного источника света
-        xLightPosition = 0.3f;
-        yLightPosition = 0.2f;
-        zLightPosition = 0.5f;
-
+    private void setup() {
+        setupLightSource();
         setupModelViewMatrix();
-
         setupVertexBuffers();
+        setupNormalsBuffer();
+        setupVerticesColorBuffers();
+    }
 
-        //вектор нормали перпендикулярен плоскости квадрата
-        //и направлен вдоль оси Z
-        float nx = 0;
-        float ny = 0;
-        float nz = 1;
-        //нормаль одинакова для всех вершин квадрата,
-        //поэтому переписываем координаты вектора нормали в массив 4 раза
-        float normalArray[] = {nx, ny, nz, nx, ny, nz, nx, ny, nz, nx, ny, nz};
-        float normalArray1[] = {0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1};
-        //создадим буфер для хранения координат векторов нормали
-        ByteBuffer bnormal = ByteBuffer.allocateDirect(normalArray.length * 4);
-        bnormal.order(ByteOrder.nativeOrder());
-        normalBuffer = bnormal.asFloatBuffer();
-        normalBuffer.position(0);
-
-        //перепишем координаты нормалей из массива в буфер
-        normalBuffer.put(normalArray);
-        normalBuffer.position(0);
-
-        //разукрасим вершины квадрата, зададим цвета для вершин
-        float red1 = 0;
-        float green1 = 1;
-        float blue1 = 1;
-        //цвет второй вершины
-        float red2 = 0;
-        float green2 = 0;
-        float blue2 = 1;
-        //цвет третьей вершины
-        float red3 = 0;
-        float green3 = 1;
-        float blue3 = 1;
-        //цвет четвертой вершины
-        float red4 = 0;
-        float green4 = 0;
-        float blue4 = 1;
-        //перепишем цвета вершин в массив
-        //четвертый компонент цвета (альфу) примем равным единице
+    private void setupVerticesColorBuffers() {
+        // square's vertices colors
+        // R-G-B-A
         float colorArray[] = {
-                red1, green1, blue1, 1,
-                red2, green2, blue2, 1,
-                red3, green3, blue3, 1,
-                red4, green4, blue4, 1,
+                0f, 1f, 1f, 1,
+                0f, 0f, 1f, 1,
+                0f, 1f, 1f, 1,
+                0f, 0f, 1f, 1,
         };
         float colorArray1[] = {
                 0.2f, 0.2f, 0.8f, 1,
@@ -128,37 +91,36 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
                 1, 1, 1, 1,
                 0.2f, 0.2f, 0.2f, 1,
         };
+        colorBuffer = createNativeFloatBuffer(colorArray);
+        colorBuffer1 = createNativeFloatBuffer(colorArray1);
+        colorBuffer2 = createNativeFloatBuffer(colorArray2);
+        colorBuffer3 = createNativeFloatBuffer(colorArray4);
+    }
 
-        //создадим буфер для хранения цветов вершин
-        ByteBuffer bcolor = ByteBuffer.allocateDirect(colorArray.length * 4);
-        bcolor.order(ByteOrder.nativeOrder());
-        colorBuffer = bcolor.asFloatBuffer();
-        colorBuffer.position(0);
-        //перепишем цвета вершин из массива в буфер
-        colorBuffer.put(colorArray);
-        colorBuffer.position(0);
+    /**
+     * Point source of light.
+     */
+    private void setupLightSource() {
+        xLightPosition = 0.3f;
+        yLightPosition = 0.2f;
+        zLightPosition = 0.5f;
+    }
 
-        ByteBuffer bcolor1 = ByteBuffer.allocateDirect(colorArray1.length * 4);
-        bcolor1.order(ByteOrder.nativeOrder());
-        colorBuffer1 = bcolor1.asFloatBuffer();
-        colorBuffer1.position(0);
-        colorBuffer1.put(colorArray1);
-        colorBuffer1.position(0);
-
-        ByteBuffer bcolor2 = ByteBuffer.allocateDirect(colorArray1.length * 4);
-        bcolor2.order(ByteOrder.nativeOrder());
-        colorBuffer2 = bcolor2.asFloatBuffer();
-        colorBuffer2.position(0);
-        colorBuffer2.put(colorArray2);
-        colorBuffer2.position(0);
-
-        ByteBuffer bcolor4 = ByteBuffer.allocateDirect(colorArray4.length * 4);
-        bcolor4.order(ByteOrder.nativeOrder());
-        colorBuffer4 = bcolor4.asFloatBuffer();
-        colorBuffer4.position(0);
-        colorBuffer4.put(colorArray4);
-        colorBuffer4.position(0);
-
+    private void setupNormalsBuffer() {
+        //вектор нормали перпендикулярен плоскости квадрата
+        //и направлен вдоль оси Z
+        float nx = 0;
+        float ny = 0;
+        float nz = 1;
+        //нормаль одинакова для всех вершин квадрата,
+        //поэтому переписываем координаты вектора нормали в массив 4 раза
+        float normalArray[] = {
+                nx, ny, nz,
+                nx, ny, nz,
+                nx, ny, nz,
+                nx, ny, nz
+        };
+        verticesNormalsBuffer = createNativeFloatBuffer(normalArray);
     }
 
     private void setupModelViewMatrix() {
@@ -182,75 +144,53 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
     }
 
     private void setupVertexBuffers() {
-        float seaVertices[] = {
+        float[] seaVertices = {
                 -1.0f, -0.35f, 0.0f,
                 -1.0f, -1.5f, 0.0f,
                 1.0f, -0.35f, 0.0f,
                 1.0f, -1.5f, 0.0f
         };
-        float skyVertices[] = {
+        float[] skyVertices = {
                 -1.0f, 1.5f, 0.0f,
                 -1.0f, -0.35f, 0.0f,
                 1.0f, 1.5f, 0.0f,
                 1.0f, -0.35f, 0
         };
-        float mainSailVertices[] = {
+        float[] mainSailVertices = {
                 -0.5f, -0.45f, 0.4f,
                 0.0f, -0.45f, 0.4f,
                 0.0f, 0.5f, 0.4f
         };
-        float smallSailVertices[] = {
+        float[] smallSailVertices = {
                 0.05f, -0.45f, 0.4f,
                 0.22f, -0.5f, 0.4f,
                 0.0f, 0.25f, 0.4f
         };
-        float boatVertices[] = {
+        float[] boatVertices = {
                 -0.5f, -0.5f, 0.4f,
                 -0.5f, -0.6f, 0.4f,
                 0.22f, -0.5f, 0.4f,
                 0.18f, -0.6f, 0.4f
         };
 
-        //создадим буфер для хранения координат вершин
-        ByteBuffer seaVerticesBuffer = ByteBuffer.allocateDirect(seaVertices.length * 4);
-        seaVerticesBuffer.order(ByteOrder.nativeOrder());
-        mSeaVerticesBuffer = seaVerticesBuffer.asFloatBuffer();
-        mSeaVerticesBuffer.position(0);
+        mSeaVerticesBuffer = createNativeFloatBuffer(seaVertices);
+        mSkyVerticesBuffer = createNativeFloatBuffer(skyVertices);
+        mMainSailVerticesBuffer = createNativeFloatBuffer(mainSailVertices);
+        mSmallSailVerticesBuffer = createNativeFloatBuffer(smallSailVertices);
+        mBoatVerticesBuffer = createNativeFloatBuffer(boatVertices);
+    }
 
-        ByteBuffer skyVerticesBuffer = ByteBuffer.allocateDirect(skyVertices.length * 4);
-        skyVerticesBuffer.order(ByteOrder.nativeOrder());
-        mSkyVerticesBuffer = skyVerticesBuffer.asFloatBuffer();
-        mSkyVerticesBuffer.position(0);
-
-        ByteBuffer mainSailVerticesBuffer = ByteBuffer.allocateDirect(mainSailVertices.length * 4);
-        mainSailVerticesBuffer.order(ByteOrder.nativeOrder());
-        mMainSailVerticesBuffer = mainSailVerticesBuffer.asFloatBuffer();
-        mMainSailVerticesBuffer.position(0);
-
-        ByteBuffer smallSailVerticesBuffer = ByteBuffer.allocateDirect(smallSailVertices.length * 4);
-        smallSailVerticesBuffer.order(ByteOrder.nativeOrder());
-        this.mSmallSailVerticesBuffer = smallSailVerticesBuffer.asFloatBuffer();
-        this.mSmallSailVerticesBuffer.position(0);
-
-        ByteBuffer boatVerticesBuffer = ByteBuffer.allocateDirect(boatVertices.length * 4);
-        boatVerticesBuffer.order(ByteOrder.nativeOrder());
-        mBoatVerticesBuffer = boatVerticesBuffer.asFloatBuffer();
-        mBoatVerticesBuffer.position(0);
-
-        mSeaVerticesBuffer.put(seaVertices);
-        mSeaVerticesBuffer.position(0);
-
-        mSkyVerticesBuffer.put(skyVertices);
-        mSkyVerticesBuffer.position(0);
-
-        mMainSailVerticesBuffer.put(mainSailVertices);
-        mMainSailVerticesBuffer.position(0);
-
-        mSmallSailVerticesBuffer.put(smallSailVertices);
-        mSmallSailVerticesBuffer.position(0);
-
-        mBoatVerticesBuffer.put(boatVertices);
-        mBoatVerticesBuffer.position(0);
+    private static FloatBuffer createNativeFloatBuffer(float[] withArray) {
+        if (withArray == null || withArray.length == 0) {
+            throw new IllegalArgumentException("Array has to be not empty.");
+        }
+        final ByteBuffer tmpBuffer = ByteBuffer.allocateDirect(withArray.length * BYTES_PER_FLOAT);
+        tmpBuffer.order(ByteOrder.nativeOrder());
+        final FloatBuffer result = tmpBuffer.asFloatBuffer();
+        result.position(0);
+        result.put(withArray);
+        result.position(0);
+        return result;
     }
 
     //метод, который срабатывает при изменении размеров экрана
@@ -327,7 +267,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         //свяжем буфер вершин с атрибутом a_vertex в вершинном шейдере
         mShader.linkVertexBuffer(mSeaVerticesBuffer);
         //свяжем буфер нормалей с атрибутом a_normal в вершинном шейдере
-        mShader.linkNormalBuffer(normalBuffer);
+        mShader.linkNormalBuffer(verticesNormalsBuffer);
         //свяжем буфер цветов с атрибутом a_color в вершинном шейдере
         mShader.linkColorBuffer(colorBuffer);
         //связь атрибутов с буферами сохраняется до тех пор,
@@ -335,23 +275,23 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
 
         mShader1 = new Shader(vertexShaderCode, fragmentShaderCode);
         mShader1.linkVertexBuffer(mSkyVerticesBuffer);
-        mShader1.linkNormalBuffer(normalBuffer);
+        mShader1.linkNormalBuffer(verticesNormalsBuffer);
         mShader1.linkColorBuffer(colorBuffer1);
 
         mShader2 = new Shader(vertexShaderCode, fragmentShaderCode);
         mShader2.linkVertexBuffer(mMainSailVerticesBuffer);
-        mShader2.linkNormalBuffer(normalBuffer);
+        mShader2.linkNormalBuffer(verticesNormalsBuffer);
         mShader2.linkColorBuffer(colorBuffer2);
 
         mShader3 = new Shader(vertexShaderCode, fragmentShaderCode);
         mShader3.linkVertexBuffer(mSmallSailVerticesBuffer);
-        mShader3.linkNormalBuffer(normalBuffer);
+        mShader3.linkNormalBuffer(verticesNormalsBuffer);
         mShader3.linkColorBuffer(colorBuffer2);
 
         mShader4 = new Shader(vertexShaderCode, fragmentShaderCode);
         mShader4.linkVertexBuffer(mBoatVerticesBuffer);
-        mShader4.linkNormalBuffer(normalBuffer);
-        mShader4.linkColorBuffer(colorBuffer4);
+        mShader4.linkNormalBuffer(verticesNormalsBuffer);
+        mShader4.linkColorBuffer(colorBuffer3);
 
     }
 
@@ -367,7 +307,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         mShader.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
         mShader.linkCamera(xСamera, yCamera, zCamera);
         mShader.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
 
         mShader1.useProgram();
         mShader1.linkVertexBuffer(mSkyVerticesBuffer);
@@ -375,7 +315,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         mShader1.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
         mShader1.linkCamera(xСamera, yCamera, zCamera);
         mShader1.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
 
         mShader2.useProgram();
         mShader2.linkVertexBuffer(mMainSailVerticesBuffer);
@@ -395,12 +335,12 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
 
         mShader4.useProgram();
         mShader4.linkVertexBuffer(mBoatVerticesBuffer);
-        mShader4.linkColorBuffer(colorBuffer4);
+        mShader4.linkColorBuffer(colorBuffer3);
         mShader4.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
         mShader4.linkCamera(xСamera, yCamera, zCamera);
         mShader4.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
 
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
     }
 
 }

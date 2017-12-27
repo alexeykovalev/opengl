@@ -54,7 +54,7 @@ public class OpenGlTestActivity extends AppCompatActivity {
     @NonNull
     private GLSurfaceView.Renderer createRenderer() {
 //        return new LessonOneRenderer(getBaseContext());
-        return new SceneLightRenderer(getApplicationContext());
+        return new SceneLightRenderer();
     }
 
     private boolean isSupportsEgl2() {
