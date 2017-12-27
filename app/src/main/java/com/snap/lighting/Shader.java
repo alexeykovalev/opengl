@@ -6,6 +6,22 @@ import java.nio.FloatBuffer;
 
 public class Shader {
 
+    public enum ShaderType {
+
+        VERTEX(GLES20.GL_VERTEX_SHADER),
+        FRAGMENT(GLES20.GL_FRAGMENT_SHADER);
+
+        private final int shaderTypeAsInt;
+
+        ShaderType(int shaderTypeAsInt) {
+            this.shaderTypeAsInt = shaderTypeAsInt;
+        }
+
+        public int asInt() {
+            return shaderTypeAsInt;
+        }
+    }
+
     /**
      * Handle (reference) to shading program.
      */
@@ -16,19 +32,29 @@ public class Shader {
     }
 
     private int createShadingProgram(String vertexShaderCode, String fragmentShaderCode) {
-        final int vertexShaderHandle = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-        GLES20.glShaderSource(vertexShaderHandle, vertexShaderCode);
-        GLES20.glCompileShader(vertexShaderHandle);
-
-        final int fragmentShaderHandle = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-        GLES20.glShaderSource(fragmentShaderHandle, fragmentShaderCode);
-        GLES20.glCompileShader(fragmentShaderHandle);
+        final int vertexShaderHandle = createAndCompileShader(ShaderType.VERTEX, vertexShaderCode);
+        final int fragmentShaderHandle = createAndCompileShader(ShaderType.FRAGMENT, fragmentShaderCode);
 
         final int shadingProgramHandle = GLES20.glCreateProgram();
         GLES20.glAttachShader(shadingProgramHandle, vertexShaderHandle);
         GLES20.glAttachShader(shadingProgramHandle, fragmentShaderHandle);
         GLES20.glLinkProgram(shadingProgramHandle);
         return shadingProgramHandle;
+    }
+
+    private static int createAndCompileShader(ShaderType shaderType, String shaderCode) {
+        final int shaderId = GLES20.glCreateShader(shaderType.asInt());
+        GLES20.glShaderSource(shaderId, shaderCode);
+        GLES20.glCompileShader(shaderId);
+
+        int[] compileStatus = new int[1];
+        GLES20.glGetShaderiv(shaderId, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
+        if (compileStatus[0] == 0) {
+            String errorMessage = "Failed to compile shader: " + GLES20.glGetShaderInfoLog(shaderId);
+            GLES20.glDeleteShader(shaderId);
+            throw new RuntimeException(errorMessage);
+        }
+        return shaderId;
     }
 
     //метод, который связывает
@@ -47,8 +73,7 @@ public class Shader {
     //метод, который связывает
     //буфер координат векторов нормалей normalBuffer с атрибутом a_normal
     public void linkNormalBuffer(FloatBuffer normalBuffer) {
-        //устанавливаем активную программу
-        GLES20.glUseProgram(mProgramHandle);
+
         //получаем ссылку на атрибут a_normal
         int attrNormalHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_normal");
         //включаем использование атрибута a_normal
@@ -62,7 +87,6 @@ public class Shader {
     //буфер цветов вершин colorBuffer с атрибутом a_color
     public void linkColorBuffer(FloatBuffer colorBuffer) {
         //устанавливаем активную программу
-        GLES20.glUseProgram(mProgramHandle);
         //получаем ссылку на атрибут a_color
         int attrColorHandle = GLES20.glGetAttribLocation(mProgramHandle, "a_color");
         //включаем использование атрибута a_color
@@ -76,7 +100,6 @@ public class Shader {
     // modelViewProjectionMatrix с униформой u_modelViewProjectionMatrix
     public void linkModelViewProjectionMatrix(float[] modelViewProjectionMatrix) {
         //устанавливаем активную программу
-        GLES20.glUseProgram(mProgramHandle);
         //получаем ссылку на униформу u_modelViewProjectionMatrix
         int uniformModelViewProjectionMatrixHandle =
                 GLES20.glGetUniformLocation(mProgramHandle, "u_modelViewProjectionMatrix");
@@ -89,7 +112,6 @@ public class Shader {
     // метод, который связывает координаты камеры с униформой u_camera
     public void linkCamera(float xCamera, float yCamera, float zCamera) {
         //устанавливаем активную программу
-        GLES20.glUseProgram(mProgramHandle);
         //получаем ссылку на униформу u_camera
         int uniformCameraPositionHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_camera");
         // связываем координаты камеры с униформой u_camera
@@ -100,7 +122,6 @@ public class Shader {
     // с униформой u_lightPosition
     public void linkLightSource(float xLightPosition, float yLightPosition, float zLightPosition) {
         //устанавливаем активную программу
-        GLES20.glUseProgram(mProgramHandle);
         //получаем ссылку на униформу u_lightPosition
         int uniformLightPositionHandle = GLES20.glGetUniformLocation(mProgramHandle, "u_lightPosition");
         // связываем координаты источника света с униформой u_lightPosition

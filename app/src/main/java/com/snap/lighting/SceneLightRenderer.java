@@ -1,6 +1,5 @@
 package com.snap.lighting;
 
-//import android.opengl.EGLConfig;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -16,18 +15,51 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
 
     private static final int BYTES_PER_FLOAT = 4;
 
-    //координаты камеры
-    private float xСamera, yCamera, zCamera;
+    private static final String VERTEX_SHADER_CODE = "uniform mat4 u_modelViewProjectionMatrix;" +
+            "attribute vec3 a_vertex;" +
+            "attribute vec3 a_normal;" +
+            "attribute vec4 a_color;" +
+            "varying vec3 v_vertex;" +
+            "varying vec3 v_normal;" +
+            "varying vec4 v_color;" +
+            "void main() {" +
+            "v_vertex=a_vertex;" +
+            "vec3 n_normal=normalize(a_normal);" +
+            "v_normal=n_normal;" +
+            "v_color=a_color;" +
+            "gl_Position = u_modelViewProjectionMatrix * vec4(a_vertex,1.0);" +
+            "}";
 
-    //координаты источника света
+    private static final String FRAGMENT_SHADER_CODE = "precision mediump float;" +
+            "uniform vec3 u_camera;" +
+            "uniform vec3 u_lightPosition;" +
+            "varying vec3 v_vertex;" +
+            "varying vec3 v_normal;" +
+            "varying vec4 v_color;" +
+            "void main() {" +
+            "vec3 n_normal=normalize(v_normal);" +
+            "vec3 lightvector = normalize(u_lightPosition - v_vertex);" +
+            "vec3 lookvector = normalize(u_camera - v_vertex);" +
+            "float ambient=0.2;" +
+            "float k_diffuse=0.3;" +
+            "float k_specular=0.5;" +
+            "float diffuse = k_diffuse * max(dot(n_normal, lightvector), 0.0);" +
+            "vec3 reflectvector = reflect(-lightvector, n_normal);" +
+            "float specular = k_specular * pow( max(dot(lookvector,reflectvector),0.0), 40.0 );" +
+            "vec4 one=vec4(1.0,1.0,1.0,1.0);" +
+            "vec4 lightColor = (ambient+diffuse+specular)*one;" +
+            "gl_FragColor = mix(lightColor,v_color,0.6);" +
+            "}";
+
+    private float xСameraPosition, yCameraPosition, zCameraPosition;
+
     private float xLightPosition, yLightPosition, zLightPosition;
 
-    //матрицы
-    private float[] modelMatrix = new float[16];
-    private float[] viewMatrix = new float[16];
-    private float[] modelViewMatrix = new float[16];
-    private float[] projectionMatrix = new float[16];
-    private float[] modelViewProjectionMatrix = new float[16];
+    private final float[] modelMatrix = new float[16];
+    private final float[] viewMatrix = new float[16];
+    private final float[] modelViewMatrix = new float[16];
+    private final float[] projectionMatrix = new float[16];
+    private final float[] modelViewProjectionMatrix = new float[16];
 
     private FloatBuffer mSeaVerticesBuffer;
     private FloatBuffer mSkyVerticesBuffer;
@@ -35,21 +67,18 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
     private FloatBuffer mSmallSailVerticesBuffer;
     private FloatBuffer mBoatVerticesBuffer;
 
-    //буфер для нормалей вершин
-    private FloatBuffer verticesNormalsBuffer;
+    private FloatBuffer mVerticesNormalsBuffer;
 
-    //буфер для цветов вершин
-    private FloatBuffer colorBuffer;
-    private FloatBuffer colorBuffer1;
-    private FloatBuffer colorBuffer2;
-    private FloatBuffer colorBuffer3;
+    private FloatBuffer mSeaVerticesColorsBuffer;
+    private FloatBuffer mSkyVerticesColorsBuffer;
+    private FloatBuffer mAnySailVerticesColorsBuffer;
+    private FloatBuffer mBoatVerticesColorsBuffer;
 
-    //шейдерный объект
-    private Shader mShader;
-    private Shader mShader1;
-    private Shader mShader2;
-    private Shader mShader3;
-    private Shader mShader4;
+    private Shader mSeaShader;
+    private Shader mSkyShader;
+    private Shader mMainSailShader;
+    private Shader mSmallSailShader;
+    private Shader mBoatShader;
 
 
     public SceneLightRenderer() {
@@ -78,15 +107,15 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         Matrix.setIdentityM(modelMatrix, 0);
 
         //координаты камеры
-        xСamera = 0.0f;
-        yCamera = 0.0f;
-        zCamera = 3.0f;
+        xСameraPosition = 0.0f;
+        yCameraPosition = 0.0f;
+        zCameraPosition = 3.0f;
 
         // пусть камера смотрит на начало координат
         // и верх у камеры будет вдоль оси Y
         // зная координаты камеры получаем матрицу вида
         Matrix.setLookAtM(
-                viewMatrix, 0, xСamera, yCamera, zCamera,
+                viewMatrix, 0, xСameraPosition, yCameraPosition, zCameraPosition,
                 0, 0, 0, 0, 1, 0);
         // умножая матрицу вида на матрицу модели
         // получаем матрицу модели-вида
@@ -144,7 +173,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
                 nx, ny, nz,
                 nx, ny, nz
         };
-        verticesNormalsBuffer = createNativeFloatBuffer(normalArray);
+        mVerticesNormalsBuffer = createNativeFloatBuffer(normalArray);
     }
 
     private void setupVerticesColorBuffers() {
@@ -174,10 +203,10 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
                 1, 1, 1, 1,
                 0.2f, 0.2f, 0.2f, 1,
         };
-        colorBuffer = createNativeFloatBuffer(colorArray);
-        colorBuffer1 = createNativeFloatBuffer(colorArray1);
-        colorBuffer2 = createNativeFloatBuffer(colorArray2);
-        colorBuffer3 = createNativeFloatBuffer(colorArray4);
+        mSeaVerticesColorsBuffer = createNativeFloatBuffer(colorArray);
+        mSkyVerticesColorsBuffer = createNativeFloatBuffer(colorArray1);
+        mAnySailVerticesColorsBuffer = createNativeFloatBuffer(colorArray2);
+        mBoatVerticesColorsBuffer = createNativeFloatBuffer(colorArray4);
     }
 
     private static FloatBuffer createNativeFloatBuffer(float[] withArray) {
@@ -187,7 +216,6 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         final ByteBuffer tmpBuffer = ByteBuffer.allocateDirect(withArray.length * BYTES_PER_FLOAT);
         tmpBuffer.order(ByteOrder.nativeOrder());
         final FloatBuffer result = tmpBuffer.asFloatBuffer();
-        result.position(0);
         result.put(withArray);
         result.position(0);
         return result;
@@ -224,122 +252,59 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         //включаем сглаживание текстур, это пригодится в будущем
         GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_NICEST);
 
-        final String vertexShaderCode =
-                "uniform mat4 u_modelViewProjectionMatrix;" +
-                        "attribute vec3 a_vertex;" +
-                        "attribute vec3 a_normal;" +
-                        "attribute vec4 a_color;" +
-                        "varying vec3 v_vertex;" +
-                        "varying vec3 v_normal;" +
-                        "varying vec4 v_color;" +
-                        "void main() {" +
-                        "v_vertex=a_vertex;" +
-                        "vec3 n_normal=normalize(a_normal);" +
-                        "v_normal=n_normal;" +
-                        "v_color=a_color;" +
-                        "gl_Position = u_modelViewProjectionMatrix * vec4(a_vertex,1.0);" +
-                        "}";
-
-        final String fragmentShaderCode =
-                "precision mediump float;" +
-                        "uniform vec3 u_camera;" +
-                        "uniform vec3 u_lightPosition;" +
-                        "varying vec3 v_vertex;" +
-                        "varying vec3 v_normal;" +
-                        "varying vec4 v_color;" +
-                        "void main() {" +
-                        "vec3 n_normal=normalize(v_normal);" +
-                        "vec3 lightvector = normalize(u_lightPosition - v_vertex);" +
-                        "vec3 lookvector = normalize(u_camera - v_vertex);" +
-                        "float ambient=0.2;" +
-                        "float k_diffuse=0.3;" +
-                        "float k_specular=0.5;" +
-                        "float diffuse = k_diffuse * max(dot(n_normal, lightvector), 0.0);" +
-                        "vec3 reflectvector = reflect(-lightvector, n_normal);" +
-                        "float specular = k_specular * pow( max(dot(lookvector,reflectvector),0.0), 40.0 );" +
-                        "vec4 one=vec4(1.0,1.0,1.0,1.0);" +
-                        "vec4 lightColor = (ambient+diffuse+specular)*one;" +
-                        "gl_FragColor = mix(lightColor,v_color,0.6);" +
-                        "}";
-        //создадим шейдерный объект
-        mShader = new Shader(vertexShaderCode, fragmentShaderCode);
-        //свяжем буфер вершин с атрибутом a_vertex в вершинном шейдере
-        mShader.linkVertexBuffer(mSeaVerticesBuffer);
-        //свяжем буфер нормалей с атрибутом a_normal в вершинном шейдере
-        mShader.linkNormalBuffer(verticesNormalsBuffer);
-        //свяжем буфер цветов с атрибутом a_color в вершинном шейдере
-        mShader.linkColorBuffer(colorBuffer);
-        //связь атрибутов с буферами сохраняется до тех пор,
-        //пока не будет уничтожен шейдерный объект
-
-        mShader1 = new Shader(vertexShaderCode, fragmentShaderCode);
-        mShader1.linkVertexBuffer(mSkyVerticesBuffer);
-        mShader1.linkNormalBuffer(verticesNormalsBuffer);
-        mShader1.linkColorBuffer(colorBuffer1);
-
-        mShader2 = new Shader(vertexShaderCode, fragmentShaderCode);
-        mShader2.linkVertexBuffer(mMainSailVerticesBuffer);
-        mShader2.linkNormalBuffer(verticesNormalsBuffer);
-        mShader2.linkColorBuffer(colorBuffer2);
-
-        mShader3 = new Shader(vertexShaderCode, fragmentShaderCode);
-        mShader3.linkVertexBuffer(mSmallSailVerticesBuffer);
-        mShader3.linkNormalBuffer(verticesNormalsBuffer);
-        mShader3.linkColorBuffer(colorBuffer2);
-
-        mShader4 = new Shader(vertexShaderCode, fragmentShaderCode);
-        mShader4.linkVertexBuffer(mBoatVerticesBuffer);
-        mShader4.linkNormalBuffer(verticesNormalsBuffer);
-        mShader4.linkColorBuffer(colorBuffer3);
-
+        mSeaShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
+        mSkyShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
+        mMainSailShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
+        mSmallSailShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
+        mBoatShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
     }
 
-    //метод, в котором выполняется рисование кадра
+    /**
+     * Frame rendering
+     */
     public void onDrawFrame(GL10 unused) {
-        //очищаем кадр
+        // clean frame
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        //передаем в шейдерный объект матрицу модели-вида-проекции
-        mShader.useProgram();
-        mShader.linkVertexBuffer(mSeaVerticesBuffer);
-        mShader.linkColorBuffer(colorBuffer);
-        mShader.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
-        mShader.linkCamera(xСamera, yCamera, zCamera);
-        mShader.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
+        // Render Sea
+        linkAttributesAndUniforms(mSeaShader,
+                mSeaVerticesBuffer, mVerticesNormalsBuffer, mSeaVerticesColorsBuffer);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
 
-        mShader1.useProgram();
-        mShader1.linkVertexBuffer(mSkyVerticesBuffer);
-        mShader1.linkColorBuffer(colorBuffer1);
-        mShader1.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
-        mShader1.linkCamera(xСamera, yCamera, zCamera);
-        mShader1.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
+        // Render Sky
+        linkAttributesAndUniforms(mSkyShader,
+                mSkyVerticesBuffer, mVerticesNormalsBuffer, mSkyVerticesColorsBuffer);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
 
-        mShader2.useProgram();
-        mShader2.linkVertexBuffer(mMainSailVerticesBuffer);
-        mShader2.linkColorBuffer(colorBuffer2);
-        mShader2.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
-        mShader2.linkCamera(xСamera, yCamera, zCamera);
-        mShader2.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
+        // Render MainSail
+        linkAttributesAndUniforms(mMainSailShader,
+                mMainSailVerticesBuffer, mVerticesNormalsBuffer, mAnySailVerticesColorsBuffer);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
 
-        mShader3.useProgram();
-        mShader3.linkVertexBuffer(mSmallSailVerticesBuffer);
-        mShader3.linkColorBuffer(colorBuffer2);
-        mShader3.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
-        mShader3.linkCamera(xСamera, yCamera, zCamera);
-        mShader3.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
+        // Render SmallSail
+        linkAttributesAndUniforms(mSmallSailShader,
+                mSmallSailVerticesBuffer, mVerticesNormalsBuffer, mAnySailVerticesColorsBuffer);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
 
-        mShader4.useProgram();
-        mShader4.linkVertexBuffer(mBoatVerticesBuffer);
-        mShader4.linkColorBuffer(colorBuffer3);
-        mShader4.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
-        mShader4.linkCamera(xСamera, yCamera, zCamera);
-        mShader4.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
-
+        // Render Boat
+        linkAttributesAndUniforms(mBoatShader,
+                mBoatVerticesBuffer, mVerticesNormalsBuffer, mBoatVerticesColorsBuffer);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
+    }
+
+    private void linkAttributesAndUniforms(Shader shader,
+                                           FloatBuffer verticesBuffer,
+                                           FloatBuffer verticesNormalsBuffer,
+                                           FloatBuffer verticesColorsBuffer) {
+        shader.useProgram();
+
+        shader.linkVertexBuffer(verticesBuffer);
+        shader.linkNormalBuffer(verticesNormalsBuffer);
+        shader.linkColorBuffer(verticesColorsBuffer);
+
+        shader.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
+        shader.linkCamera(xСameraPosition, yCameraPosition, zCameraPosition);
+        shader.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
     }
 
 }
