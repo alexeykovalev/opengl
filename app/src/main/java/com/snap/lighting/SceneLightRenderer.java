@@ -64,39 +64,6 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         setupVerticesColorBuffers();
     }
 
-    private void setupVerticesColorBuffers() {
-        // square's vertices colors
-        // R-G-B-A
-        float colorArray[] = {
-                0f, 1f, 1f, 1,
-                0f, 0f, 1f, 1,
-                0f, 1f, 1f, 1,
-                0f, 0f, 1f, 1,
-        };
-        float colorArray1[] = {
-                0.2f, 0.2f, 0.8f, 1,
-                0.5f, 0.5f, 1, 1,
-                0.2f, 0.2f, 0.8f, 1,
-                0.5f, 0.5f, 1, 1,
-        };
-        float colorArray2[] = {
-                1, 0.1f, 0.1f, 1,
-                1, 1, 1, 1,
-                1, 0.1f, 0.1f, 1,
-        };
-
-        float colorArray4[] = {
-                1, 1, 1, 1,
-                0.2f, 0.2f, 0.2f, 1,
-                1, 1, 1, 1,
-                0.2f, 0.2f, 0.2f, 1,
-        };
-        colorBuffer = createNativeFloatBuffer(colorArray);
-        colorBuffer1 = createNativeFloatBuffer(colorArray1);
-        colorBuffer2 = createNativeFloatBuffer(colorArray2);
-        colorBuffer3 = createNativeFloatBuffer(colorArray4);
-    }
-
     /**
      * Point source of light.
      */
@@ -104,23 +71,6 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         xLightPosition = 0.3f;
         yLightPosition = 0.2f;
         zLightPosition = 0.5f;
-    }
-
-    private void setupNormalsBuffer() {
-        //вектор нормали перпендикулярен плоскости квадрата
-        //и направлен вдоль оси Z
-        float nx = 0;
-        float ny = 0;
-        float nz = 1;
-        //нормаль одинакова для всех вершин квадрата,
-        //поэтому переписываем координаты вектора нормали в массив 4 раза
-        float normalArray[] = {
-                nx, ny, nz,
-                nx, ny, nz,
-                nx, ny, nz,
-                nx, ny, nz
-        };
-        verticesNormalsBuffer = createNativeFloatBuffer(normalArray);
     }
 
     private void setupModelViewMatrix() {
@@ -180,6 +130,56 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         mBoatVerticesBuffer = createNativeFloatBuffer(boatVertices);
     }
 
+    private void setupNormalsBuffer() {
+        //вектор нормали перпендикулярен плоскости квадрата
+        //и направлен вдоль оси Z
+        float nx = 0;
+        float ny = 0;
+        float nz = 1;
+        //нормаль одинакова для всех вершин квадрата,
+        //поэтому переписываем координаты вектора нормали в массив 4 раза
+        float normalArray[] = {
+                nx, ny, nz,
+                nx, ny, nz,
+                nx, ny, nz,
+                nx, ny, nz
+        };
+        verticesNormalsBuffer = createNativeFloatBuffer(normalArray);
+    }
+
+    private void setupVerticesColorBuffers() {
+        // square's vertices colors
+        // R-G-B-A
+        float colorArray[] = {
+                0f, 1f, 1f, 1,
+                0f, 0f, 1f, 1,
+                0f, 1f, 1f, 1,
+                0f, 0f, 1f, 1,
+        };
+        float colorArray1[] = {
+                0.2f, 0.2f, 0.8f, 1,
+                0.5f, 0.5f, 1, 1,
+                0.2f, 0.2f, 0.8f, 1,
+                0.5f, 0.5f, 1, 1,
+        };
+        float colorArray2[] = {
+                1, 0.1f, 0.1f, 1,
+                1, 1, 1, 1,
+                1, 0.1f, 0.1f, 1,
+        };
+
+        float colorArray4[] = {
+                1, 1, 1, 1,
+                0.2f, 0.2f, 0.2f, 1,
+                1, 1, 1, 1,
+                0.2f, 0.2f, 0.2f, 1,
+        };
+        colorBuffer = createNativeFloatBuffer(colorArray);
+        colorBuffer1 = createNativeFloatBuffer(colorArray1);
+        colorBuffer2 = createNativeFloatBuffer(colorArray2);
+        colorBuffer3 = createNativeFloatBuffer(colorArray4);
+    }
+
     private static FloatBuffer createNativeFloatBuffer(float[] withArray) {
         if (withArray == null || withArray.length == 0) {
             throw new IllegalArgumentException("Array has to be not empty.");
@@ -222,10 +222,9 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         //включаем отсечение невидимых граней
         GLES20.glEnable(GLES20.GL_CULL_FACE);
         //включаем сглаживание текстур, это пригодится в будущем
-        GLES20.glHint(
-                GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_NICEST);
-        //записываем код вершинного шейдера в виде строки
-        String vertexShaderCode =
+        GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_NICEST);
+
+        final String vertexShaderCode =
                 "uniform mat4 u_modelViewProjectionMatrix;" +
                         "attribute vec3 a_vertex;" +
                         "attribute vec3 a_normal;" +
@@ -240,8 +239,8 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
                         "v_color=a_color;" +
                         "gl_Position = u_modelViewProjectionMatrix * vec4(a_vertex,1.0);" +
                         "}";
-        //записываем код фрагментного шейдера в виде строки
-        String fragmentShaderCode =
+
+        final String fragmentShaderCode =
                 "precision mediump float;" +
                         "uniform vec3 u_camera;" +
                         "uniform vec3 u_lightPosition;" +
