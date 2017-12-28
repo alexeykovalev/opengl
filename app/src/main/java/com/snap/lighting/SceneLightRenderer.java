@@ -177,36 +177,34 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
     }
 
     private void setupVerticesColorBuffers() {
-        // square's vertices colors
         // R-G-B-A
-        float colorArray[] = {
+        float[] seaVerticesColors = {
                 0f, 1f, 1f, 1,
                 0f, 0f, 1f, 1,
                 0f, 1f, 1f, 1,
                 0f, 0f, 1f, 1,
         };
-        float colorArray1[] = {
+        float[] skyVerticesColors = {
                 0.2f, 0.2f, 0.8f, 1,
                 0.5f, 0.5f, 1, 1,
                 0.2f, 0.2f, 0.8f, 1,
                 0.5f, 0.5f, 1, 1,
         };
-        float colorArray2[] = {
+        float[] sailVerticesColors = {
                 1, 0.1f, 0.1f, 1,
                 1, 1, 1, 1,
                 1, 0.1f, 0.1f, 1,
         };
-
-        float colorArray4[] = {
+        float[] boatVerticesColors = {
                 1, 1, 1, 1,
                 0.2f, 0.2f, 0.2f, 1,
                 1, 1, 1, 1,
                 0.2f, 0.2f, 0.2f, 1,
         };
-        mSeaVerticesColorsBuffer = createNativeFloatBuffer(colorArray);
-        mSkyVerticesColorsBuffer = createNativeFloatBuffer(colorArray1);
-        mAnySailVerticesColorsBuffer = createNativeFloatBuffer(colorArray2);
-        mBoatVerticesColorsBuffer = createNativeFloatBuffer(colorArray4);
+        mSeaVerticesColorsBuffer = createNativeFloatBuffer(seaVerticesColors);
+        mSkyVerticesColorsBuffer = createNativeFloatBuffer(skyVerticesColors);
+        mAnySailVerticesColorsBuffer = createNativeFloatBuffer(sailVerticesColors);
+        mBoatVerticesColorsBuffer = createNativeFloatBuffer(boatVerticesColors);
     }
 
     private static FloatBuffer createNativeFloatBuffer(float[] withArray) {
