@@ -48,15 +48,15 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
                 "vec3 n_normal = normalize(v_normal);" +
                 "vec3 lightvector = normalize(u_lightPosition - v_vertex);" +
                 "vec3 lookvector = normalize(u_camera - v_vertex);" +
-                "float ambient = 0.2;" +
-                "float k_diffuse = 0.3;" +
-                "float k_specular = 0.5;" +
+                "float ambient = 0.0; /*0.2*/" +
+                "float k_diffuse = 0.0; /*0.3*/" +
+                "float k_specular = 1.0; /*0.5*/" +
                 "float diffuse = k_diffuse * max(dot(n_normal, lightvector), 0.0);" +
                 "vec3 reflectvector = reflect(-lightvector, n_normal);" +
-                "float specular = k_specular * pow( max(dot(lookvector,reflectvector),0.0), 40.0 );" +
+                "float specular = k_specular * pow(max(dot(lookvector,reflectvector),0.0), 40.0 );" +
                 "vec4 one = vec4(1.0, 1.0, 1.0, 1.0);" +
-                "vec4 lightColor = (ambient+diffuse+specular)*one;" +
-                "gl_FragColor = mix(lightColor,v_color,0.6);" +
+                "vec4 lightColor = (ambient + diffuse + specular)*one;" +
+                "gl_FragColor = mix(lightColor, v_color, 0.0);" +
             "}";
 
     private float xСameraPosition, yCameraPosition, zCameraPosition;
@@ -105,7 +105,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
      * Point source of light.
      */
     private void setupLightSource() {
-        xLightPosition = 0.3f;
+        xLightPosition = 0.5f;
         yLightPosition = 0.2f;
         zLightPosition = 0.5f;
     }
