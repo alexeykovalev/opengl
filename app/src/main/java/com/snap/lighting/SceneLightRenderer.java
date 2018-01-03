@@ -4,9 +4,14 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import com.snap.model.exception.GlLibException;
+import com.snap.model.shading.Shader;
+import com.snap.model.shading.ShadingProgram;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -15,6 +20,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
 
     private static final int BYTES_PER_FLOAT = 4;
 
+    // TODO: 1/3/18 oleksiikovalov has to be removed to wrapper - LightSceneShadingProgram
     private static final String VERTEX_SHADER_CODE =
             "uniform mat4 u_modelViewProjectionMatrix;" +
 
@@ -34,6 +40,7 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
                 "gl_Position = u_modelViewProjectionMatrix * vec4(a_vertex, 1.0);" +
             "}";
 
+    // TODO: 1/3/18 oleksiikovalov has to be removed to wrapper - LightSceneShadingProgram
     private static final String FRAGMENT_SHADER_CODE =
             "precision mediump float;" +
 
@@ -49,8 +56,8 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
                 "vec3 lightvector = normalize(u_lightPosition - v_vertex);" +
                 "vec3 lookvector = normalize(u_camera - v_vertex);" +
                 "float ambient = 0.0; /*0.2*/" +
-                "float k_diffuse = 0.0; /*0.3*/" +
-                "float k_specular = 1.0; /*0.5*/" +
+                "float k_diffuse = 1.0; /*0.3*/" +
+                "float k_specular = 0.0; /*0.5*/" +
                 "float diffuse = k_diffuse * max(dot(n_normal, lightvector), 0.0);" +
                 "vec3 reflectvector = reflect(-lightvector, n_normal);" +
                 "float specular = k_specular * pow(max(dot(lookvector,reflectvector),0.0), 40.0 );" +
@@ -82,11 +89,11 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
     private FloatBuffer mAnySailVerticesColorsBuffer;
     private FloatBuffer mBoatVerticesColorsBuffer;
 
-    private Shader mSeaShader;
-    private Shader mSkyShader;
-    private Shader mMainSailShader;
-    private Shader mSmallSailShader;
-    private Shader mBoatShader;
+    private ShadingProgram mSeaShader;
+    private ShadingProgram mSkyShader;
+    private ShadingProgram mMainSailShader;
+    private ShadingProgram mSmallSailShader;
+    private ShadingProgram mBoatShader;
 
 
     public SceneLightRenderer() {
@@ -258,11 +265,35 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         //включаем сглаживание текстур, это пригодится в будущем
         GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_NICEST);
 
-        mSeaShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
-        mSkyShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
-        mMainSailShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
-        mSmallSailShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
-        mBoatShader = new Shader(VERTEX_SHADER_CODE, FRAGMENT_SHADER_CODE);
+        mSeaShader = createShadingProgram();
+        mSkyShader = createShadingProgram();
+        mMainSailShader = createShadingProgram();
+        mSmallSailShader = createShadingProgram();
+        mBoatShader = createShadingProgram();
+
+        try {
+            mSeaShader.setup();
+            mSkyShader.setup();
+            mMainSailShader.setup();
+            mSmallSailShader.setup();
+            mBoatShader.setup();
+        } catch (GlLibException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    private static ShadingProgram createShadingProgram() {
+        return new ShadingProgram(Arrays.asList(createVertexShader(), createFragmentShader()));
+    }
+
+    private static Shader createVertexShader() {
+        return Shader.fromSourceCode(Shader.ShaderType.VERTEX, VERTEX_SHADER_CODE);
+    }
+
+    private static Shader createFragmentShader() {
+        return Shader.fromSourceCode(Shader.ShaderType.FRAGMENT, FRAGMENT_SHADER_CODE);
     }
 
     /**
@@ -298,19 +329,19 @@ public class SceneLightRenderer implements GLSurfaceView.Renderer {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
     }
 
-    private void linkAttributesAndUniforms(Shader shader,
+    private void linkAttributesAndUniforms(ShadingProgram shadingProgram,
                                            FloatBuffer verticesBuffer,
                                            FloatBuffer verticesNormalsBuffer,
                                            FloatBuffer verticesColorsBuffer) {
-        shader.useProgram();
+        shadingProgram.useProgram();
 
-        shader.linkVertexBuffer(verticesBuffer);
-        shader.linkNormalBuffer(verticesNormalsBuffer);
-        shader.linkColorBuffer(verticesColorsBuffer);
+        shadingProgram.linkVertexBuffer(verticesBuffer);
+        shadingProgram.linkNormalBuffer(verticesNormalsBuffer);
+        shadingProgram.linkColorBuffer(verticesColorsBuffer);
 
-        shader.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
-        shader.linkCamera(xСameraPosition, yCameraPosition, zCameraPosition);
-        shader.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
+        shadingProgram.linkModelViewProjectionMatrix(modelViewProjectionMatrix);
+        shadingProgram.linkCamera(xСameraPosition, yCameraPosition, zCameraPosition);
+        shadingProgram.linkLightSource(xLightPosition, yLightPosition, zLightPosition);
     }
 
 }
