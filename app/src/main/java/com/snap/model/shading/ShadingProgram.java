@@ -6,7 +6,6 @@ import com.snap.model.ParamBinding;
 import com.snap.model.exception.GlException;
 import com.snap.model.exception.GlLibException;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,43 +76,21 @@ public class ShadingProgram {
         GLES20.glUseProgram(mProgramHandle);
     }
 
-
-    // TODO: 1/3/18 oleksiikovalov has to be removed to wrapper - LightSceneShadingProgram
-
-    public void linkVertexBuffer(FloatBuffer vertexBuffer) {
+    public void executeUsingProgram(final ShadingProgramAction shadingProgramActionToExecute) {
         useProgram();
-        ParamBinding.ofAttribute(mProgramHandle, "a_vertex")
-                .bindFloatBuffer(vertexBuffer, 3, false, 0);
+        shadingProgramActionToExecute.execute(this);
     }
 
-    public void linkNormalBuffer(FloatBuffer normalBuffer) {
-        useProgram();
-        ParamBinding.ofAttribute(mProgramHandle, "a_normal")
-                .bindFloatBuffer(normalBuffer, 3, false, 0);
+    public ParamBinding createAttributeBinding(final String attributeName) {
+        return ParamBinding.ofAttribute(mProgramHandle, attributeName);
     }
 
-    public void linkColorBuffer(FloatBuffer colorBuffer) {
-        useProgram();
-        ParamBinding.ofAttribute(mProgramHandle, "a_color")
-                .bindFloatBuffer(colorBuffer, 4, false, 0);
+    public ParamBinding createUniformBinding(final String uniformName) {
+        return ParamBinding.ofUniform(mProgramHandle, uniformName);
     }
 
-    public void linkModelViewProjectionMatrix(float[] modelViewProjectionMatrix) {
-        useProgram();
-        ParamBinding.ofUniform(mProgramHandle, "u_modelViewProjectionMatrix")
-                .bindUniformMatrix4fv(modelViewProjectionMatrix);
-    }
+    public interface ShadingProgramAction {
 
-    public void linkCamera(float xCamera, float yCamera, float zCamera) {
-        useProgram();
-        ParamBinding.ofUniform(mProgramHandle, "u_camera")
-                .bindUniform3f(xCamera, yCamera, zCamera);
+        void execute(ShadingProgram withProgram);
     }
-
-    public void linkLightSource(float xLightPosition, float yLightPosition, float zLightPosition) {
-        useProgram();
-        ParamBinding.ofUniform(mProgramHandle, "u_lightPosition")
-                .bindUniform3f(xLightPosition, yLightPosition, zLightPosition);
-    }
-
 }

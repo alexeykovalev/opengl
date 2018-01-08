@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.snap.lighting.SceneLightRenderer;
+import com.snap.lighting.LightSceneRenderer;
 
 public class OpenGlTestActivity extends AppCompatActivity {
 
@@ -54,7 +54,7 @@ public class OpenGlTestActivity extends AppCompatActivity {
     @NonNull
     private GLSurfaceView.Renderer createRenderer() {
 //        return new LessonOneRenderer(getBaseContext());
-        return new SceneLightRenderer();
+        return new LightSceneRenderer();
     }
 
     private boolean isSupportsEgl2() {
