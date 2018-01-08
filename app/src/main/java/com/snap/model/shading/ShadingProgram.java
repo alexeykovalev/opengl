@@ -2,7 +2,6 @@ package com.snap.model.shading;
 
 import android.opengl.GLES20;
 
-import com.snap.model.ParamBinding;
 import com.snap.model.exception.GlException;
 import com.snap.model.exception.GlLibException;
 
@@ -81,12 +80,12 @@ public class ShadingProgram {
         shadingProgramActionToExecute.execute(this);
     }
 
-    public ParamBinding createAttributeBinding(final String attributeName) {
-        return ParamBinding.ofAttribute(mProgramHandle, attributeName);
+    public AttributeBinding createAttributeBinding(final String attributeName) {
+        return new AttributeBinding(mProgramHandle, attributeName);
     }
 
-    public ParamBinding createUniformBinding(final String uniformName) {
-        return ParamBinding.ofUniform(mProgramHandle, uniformName);
+    public UniformBinding createUniformBinding(final String uniformName) {
+        return new UniformBinding(mProgramHandle, uniformName);
     }
 
     public interface ShadingProgramAction {
