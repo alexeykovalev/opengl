@@ -4,18 +4,15 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import com.snap.model.GlHelpers;
 import com.snap.model.exception.GlLibException;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class LightSceneRenderer implements GLSurfaceView.Renderer {
-
-    private static final int BYTES_PER_FLOAT = 4;
 
     private float xСameraPosition, yCameraPosition, zCameraPosition;
 
@@ -118,11 +115,11 @@ public class LightSceneRenderer implements GLSurfaceView.Renderer {
                 0.18f, -0.6f, 0.4f
         };
 
-        mSeaVerticesBuffer = createNativeFloatBuffer(seaVertices);
-        mSkyVerticesBuffer = createNativeFloatBuffer(skyVertices);
-        mMainSailVerticesBuffer = createNativeFloatBuffer(mainSailVertices);
-        mSmallSailVerticesBuffer = createNativeFloatBuffer(smallSailVertices);
-        mBoatVerticesBuffer = createNativeFloatBuffer(boatVertices);
+        mSeaVerticesBuffer = GlHelpers.createNativeFloatBuffer(seaVertices);
+        mSkyVerticesBuffer = GlHelpers.createNativeFloatBuffer(skyVertices);
+        mMainSailVerticesBuffer = GlHelpers.createNativeFloatBuffer(mainSailVertices);
+        mSmallSailVerticesBuffer = GlHelpers.createNativeFloatBuffer(smallSailVertices);
+        mBoatVerticesBuffer = GlHelpers.createNativeFloatBuffer(boatVertices);
     }
 
     private void setupNormalsBuffer() {
@@ -139,7 +136,7 @@ public class LightSceneRenderer implements GLSurfaceView.Renderer {
                 nx, ny, nz,
                 nx, ny, nz
         };
-        mVerticesNormalsBuffer = createNativeFloatBuffer(normalArray);
+        mVerticesNormalsBuffer = GlHelpers.createNativeFloatBuffer(normalArray);
     }
 
     private void setupVerticesColorBuffers() {
@@ -167,22 +164,10 @@ public class LightSceneRenderer implements GLSurfaceView.Renderer {
                 1, 1, 1, 1,
                 0.2f, 0.2f, 0.2f, 1,
         };
-        mSeaVerticesColorsBuffer = createNativeFloatBuffer(seaVerticesColors);
-        mSkyVerticesColorsBuffer = createNativeFloatBuffer(skyVerticesColors);
-        mAnySailVerticesColorsBuffer = createNativeFloatBuffer(sailVerticesColors);
-        mBoatVerticesColorsBuffer = createNativeFloatBuffer(boatVerticesColors);
-    }
-
-    private static FloatBuffer createNativeFloatBuffer(float[] withArray) {
-        if (withArray == null || withArray.length == 0) {
-            throw new IllegalArgumentException("Array has to be not empty.");
-        }
-        final ByteBuffer tmpBuffer = ByteBuffer.allocateDirect(withArray.length * BYTES_PER_FLOAT);
-        tmpBuffer.order(ByteOrder.nativeOrder());
-        final FloatBuffer result = tmpBuffer.asFloatBuffer();
-        result.put(withArray);
-        result.position(0);
-        return result;
+        mSeaVerticesColorsBuffer = GlHelpers.createNativeFloatBuffer(seaVerticesColors);
+        mSkyVerticesColorsBuffer = GlHelpers.createNativeFloatBuffer(skyVerticesColors);
+        mAnySailVerticesColorsBuffer = GlHelpers.createNativeFloatBuffer(sailVerticesColors);
+        mBoatVerticesColorsBuffer = GlHelpers.createNativeFloatBuffer(boatVerticesColors);
     }
 
     /**
@@ -243,12 +228,12 @@ public class LightSceneRenderer implements GLSurfaceView.Renderer {
         // Render Sea
         linkAttributesAndUniforms(mSeaShader,
                 mSeaVerticesBuffer, mVerticesNormalsBuffer, mSeaVerticesColorsBuffer);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, GlHelpers.BYTES_PER_FLOAT);
 
         // Render Sky
         linkAttributesAndUniforms(mSkyShader,
                 mSkyVerticesBuffer, mVerticesNormalsBuffer, mSkyVerticesColorsBuffer);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, GlHelpers.BYTES_PER_FLOAT);
 
         // Render MainSail
         linkAttributesAndUniforms(mMainSailShader,
@@ -263,7 +248,7 @@ public class LightSceneRenderer implements GLSurfaceView.Renderer {
         // Render Boat
         linkAttributesAndUniforms(mBoatShader,
                 mBoatVerticesBuffer, mVerticesNormalsBuffer, mBoatVerticesColorsBuffer);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, BYTES_PER_FLOAT);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, GlHelpers.BYTES_PER_FLOAT);
     }
 
     private void linkAttributesAndUniforms(LightSceneShadingProgram shadingProgram,

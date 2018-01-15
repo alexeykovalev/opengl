@@ -23,4 +23,8 @@ public class UniformBinding {
     public void bindUniform3f(final float first, final float second, final float third) {
         GLES20.glUniform3f(uniformHandle, first, second, third);
     }
+
+    public void bindUniform4f(final float first, final float second, final float third, final float fourth) {
+        GLES20.glUniform4f(uniformHandle, first, second, third, fourth);
+    }
 }
