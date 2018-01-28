@@ -69,7 +69,7 @@ public class ShadingProgram {
         GLES20.glUseProgram(mProgramHandle);
     }
 
-    public void executeUsingProgram(final ShadingProgramAction shadingProgramActionToExecute) {
+    public void executeAction(final ShadingProgramAction shadingProgramActionToExecute) {
         useProgram();
         shadingProgramActionToExecute.execute(this);
     }
@@ -116,6 +116,6 @@ public class ShadingProgram {
 
     public interface ShadingProgramAction {
 
-        void execute(ShadingProgram withProgram);
+        void execute(ShadingProgram onProgram);
     }
 }

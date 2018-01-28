@@ -5,8 +5,6 @@ import com.snap.model.shading.Shader;
 import com.snap.model.shading.ShadingProgram;
 
 import java.nio.FloatBuffer;
-import java.util.Arrays;
-import java.util.List;
 
 public class LightSceneShadingProgram {
 
@@ -78,14 +76,14 @@ public class LightSceneShadingProgram {
     }
 
     private void executeUsingShadingProgram(ShadingProgram.ShadingProgramAction action) {
-        shadingProgram.executeUsingProgram(action);
+        shadingProgram.executeAction(action);
     }
 
     public void linkVertexBuffer(final FloatBuffer vertexBuffer) {
         executeUsingShadingProgram(new ShadingProgram.ShadingProgramAction() {
             @Override
-            public void execute(ShadingProgram withProgram) {
-                withProgram.createAttributeBinding("a_vertex")
+            public void execute(ShadingProgram onProgram) {
+                onProgram.createAttributeBinding("a_vertex")
                         .bindVertices(vertexBuffer, 3, false, 0);
             }
         });
@@ -94,7 +92,7 @@ public class LightSceneShadingProgram {
     public void linkNormalBuffer(final FloatBuffer normalBuffer) {
         executeUsingShadingProgram(new ShadingProgram.ShadingProgramAction() {
             @Override
-            public void execute(ShadingProgram withProgram) {
+            public void execute(ShadingProgram onProgram) {
                 shadingProgram.createAttributeBinding("a_normal")
                         .bindVertices(normalBuffer, 3, false, 0);
             }
@@ -104,7 +102,7 @@ public class LightSceneShadingProgram {
     public void linkColorBuffer(final FloatBuffer colorBuffer) {
         executeUsingShadingProgram(new ShadingProgram.ShadingProgramAction() {
             @Override
-            public void execute(ShadingProgram withProgram) {
+            public void execute(ShadingProgram onProgram) {
                 shadingProgram.createAttributeBinding("a_color")
                         .bindVertices(colorBuffer, 4, false, 0);
             }
@@ -114,8 +112,8 @@ public class LightSceneShadingProgram {
     public void linkModelViewProjectionMatrix(final float[] modelViewProjectionMatrix) {
         executeUsingShadingProgram(new ShadingProgram.ShadingProgramAction() {
             @Override
-            public void execute(ShadingProgram withProgram) {
-                withProgram.createUniformBinding("u_modelViewProjectionMatrix")
+            public void execute(ShadingProgram onProgram) {
+                onProgram.createUniformBinding("u_modelViewProjectionMatrix")
                         .bindUniformMatrix4fv(modelViewProjectionMatrix);
             }
         });
@@ -124,8 +122,8 @@ public class LightSceneShadingProgram {
     public void linkCamera(final float xCamera, final float yCamera, final float zCamera) {
         executeUsingShadingProgram(new ShadingProgram.ShadingProgramAction() {
             @Override
-            public void execute(ShadingProgram withProgram) {
-                withProgram.createUniformBinding("u_camera")
+            public void execute(ShadingProgram onProgram) {
+                onProgram.createUniformBinding("u_camera")
                         .bindUniform3f(xCamera, yCamera, zCamera);
             }
         });
@@ -134,8 +132,8 @@ public class LightSceneShadingProgram {
     public void linkLightSource(final float xLightPosition, final float yLightPosition, final float zLightPosition) {
         executeUsingShadingProgram(new ShadingProgram.ShadingProgramAction() {
             @Override
-            public void execute(ShadingProgram withProgram) {
-                withProgram.createUniformBinding("u_lightPosition")
+            public void execute(ShadingProgram onProgram) {
+                onProgram.createUniformBinding("u_lightPosition")
                         .bindUniform3f(xLightPosition, yLightPosition, zLightPosition);
             }
         });
