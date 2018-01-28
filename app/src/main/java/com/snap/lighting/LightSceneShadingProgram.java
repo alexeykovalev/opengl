@@ -56,8 +56,9 @@ public class LightSceneShadingProgram {
     private final ShadingProgram shadingProgram;
 
     public static LightSceneShadingProgram newInstance() {
-        final List<Shader> shaders = Arrays.asList(createVertexShader(), createFragmentShader());
-        return new LightSceneShadingProgram(new ShadingProgram(shaders));
+        final ShadingProgram.ShadingPair shadingPair = new ShadingProgram.ShadingPair(
+                createVertexShader(), createFragmentShader());
+        return new LightSceneShadingProgram(new ShadingProgram(shadingPair));
     }
 
     private static Shader createVertexShader() {
@@ -85,7 +86,7 @@ public class LightSceneShadingProgram {
             @Override
             public void execute(ShadingProgram withProgram) {
                 withProgram.createAttributeBinding("a_vertex")
-                        .bindFloatBuffer(vertexBuffer, 3, false, 0);
+                        .bindVertices(vertexBuffer, 3, false, 0);
             }
         });
     }
@@ -95,7 +96,7 @@ public class LightSceneShadingProgram {
             @Override
             public void execute(ShadingProgram withProgram) {
                 shadingProgram.createAttributeBinding("a_normal")
-                        .bindFloatBuffer(normalBuffer, 3, false, 0);
+                        .bindVertices(normalBuffer, 3, false, 0);
             }
         });
     }
@@ -105,7 +106,7 @@ public class LightSceneShadingProgram {
             @Override
             public void execute(ShadingProgram withProgram) {
                 shadingProgram.createAttributeBinding("a_color")
-                        .bindFloatBuffer(colorBuffer, 4, false, 0);
+                        .bindVertices(colorBuffer, 4, false, 0);
             }
         });
     }

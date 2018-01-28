@@ -48,11 +48,16 @@ public class Shader {
         mShaderSourceCode = shaderSourceCode;
     }
 
+    public ShaderType getType() {
+        return mShaderType;
+    }
+
     public boolean isSetup() {
         return mShaderHandle != NOT_DEFINED_HANDLE;
     }
 
     public int getShaderHandle() {
+        checkIsSetup();
         return mShaderHandle;
     }
 
@@ -61,6 +66,12 @@ public class Shader {
             throw new GlLibException("Shader already setup and available by [" + mShaderHandle + "] handle");
         }
         mShaderHandle = createAndCompileShader(mShaderType, mShaderSourceCode);
+    }
+
+    private void checkIsSetup() {
+        if (!isSetup()) {
+            throw new IllegalStateException("You have to setup shader before calling method.");
+        }
     }
 
     public void release() {

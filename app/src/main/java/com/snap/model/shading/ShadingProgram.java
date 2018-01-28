@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents Pair of shaders - Vertex and Fragment.
+ */
 public class ShadingProgram {
 
     private static final int NOT_DEFINED_PROGRAM_HANDLE = 0;
@@ -18,17 +21,14 @@ public class ShadingProgram {
      */
     private int mProgramHandle;
 
-    private final List<Shader> mShaders;
+    private final ShadingPair mShadingPair;
 
-    public static int createShadingProgram(List<Shader> shaders) throws GlLibException {
+    public static int createShadingProgram(ShadingPair shadingPair) throws GlLibException {
         final int shadingProgramHandle = GLES20.glCreateProgram();
         if (shadingProgramHandle == NOT_DEFINED_PROGRAM_HANDLE) {
             throw new GlException("Could not create shading program.");
         }
-        for (Shader shader : shaders) {
-            shader.setup();
-            GLES20.glAttachShader(shadingProgramHandle, shader.getShaderHandle());
-        }
+        shadingPair.setupAndAttachToProgram(shadingProgramHandle);
         GLES20.glLinkProgram(shadingProgramHandle);
         final int[] linkStatus = new int[1];
         GLES20.glGetProgramiv(shadingProgramHandle, GLES20.GL_LINK_STATUS, linkStatus, 0);
@@ -40,14 +40,8 @@ public class ShadingProgram {
         return shadingProgramHandle;
     }
 
-    /**
-     * Order of shaders is important Vertex -> Fragment
-     */
-    public ShadingProgram(List<Shader> shaders) {
-        if (shaders.isEmpty()) {
-            throw new IllegalArgumentException("Shading program should contains shaders - you haven't passed any.");
-        }
-        mShaders = Collections.unmodifiableList(new ArrayList<>(shaders));
+    public ShadingProgram(ShadingPair shadingPair) {
+        mShadingPair = shadingPair;
     }
 
     public boolean isSetup() {
@@ -58,7 +52,7 @@ public class ShadingProgram {
         if (isSetup()) {
             throw new GlLibException("Shading program already setup.");
         }
-        mProgramHandle = createShadingProgram(mShaders);
+        mProgramHandle = createShadingProgram(mShadingPair);
     }
 
     public void release() {
@@ -86,6 +80,38 @@ public class ShadingProgram {
 
     public UniformBinding createUniformBinding(final String uniformName) {
         return new UniformBinding(mProgramHandle, uniformName);
+    }
+
+    public static class ShadingPair {
+
+        private final Shader vertexShader;
+        private final Shader fragmentShader;
+
+        public ShadingPair(Shader vertexShader, Shader fragmentShader) {
+            if (vertexShader.getType() != Shader.ShaderType.VERTEX) {
+                throw new IllegalArgumentException("First param has to be a Vertex shader.");
+            }
+            if (fragmentShader.getType() != Shader.ShaderType.FRAGMENT) {
+                throw new IllegalArgumentException("Second param has to be a Fragment shader.");
+            }
+            this.vertexShader = vertexShader;
+            this.fragmentShader = fragmentShader;
+        }
+
+        public Shader getVertexShader() {
+            return vertexShader;
+        }
+
+        public Shader getFragmentShader() {
+            return fragmentShader;
+        }
+
+        void setupAndAttachToProgram(final int shadingProgramHandle) throws GlLibException {
+            vertexShader.setup();
+            GLES20.glAttachShader(shadingProgramHandle, vertexShader.getShaderHandle());
+            fragmentShader.setup();
+            GLES20.glAttachShader(shadingProgramHandle, fragmentShader.getShaderHandle());
+        }
     }
 
     public interface ShadingProgramAction {

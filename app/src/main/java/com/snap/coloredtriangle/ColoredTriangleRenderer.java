@@ -9,13 +9,17 @@ import com.snap.model.shading.ShadingProgram;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import static android.opengl.GLES20.*;
+import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
+import static android.opengl.GLES20.GL_TRIANGLES;
+import static android.opengl.GLES20.glClear;
+import static android.opengl.GLES20.glClearColor;
+import static android.opengl.GLES20.glDrawArrays;
+import static android.opengl.GLES20.glViewport;
 
 public class ColoredTriangleRenderer implements GLSurfaceView.Renderer {
 
@@ -60,7 +64,7 @@ public class ColoredTriangleRenderer implements GLSurfaceView.Renderer {
     private void setupShadingProgram() {
         Shader vertexShader = Shader.fromSourceCode(Shader.ShaderType.VERTEX, VERTEX_SHADER_CODE);
         Shader fragmentShader = Shader.fromSourceCode(Shader.ShaderType.FRAGMENT, FRAGMENT_SHADER_CODE);
-        shadingProgram = new ShadingProgram(Arrays.asList(vertexShader, fragmentShader));
+        shadingProgram = new ShadingProgram(new ShadingProgram.ShadingPair(vertexShader, fragmentShader));
         try {
             shadingProgram.setup();
         } catch (GlLibException e) {
@@ -73,7 +77,7 @@ public class ColoredTriangleRenderer implements GLSurfaceView.Renderer {
             @Override
             public void execute(ShadingProgram withProgram) {
                 withProgram.createAttributeBinding("a_Position")
-                        .bindFloatBuffer(triangleVertices, 3, false, 0);
+                        .bindVertices(triangleVertices, 3, false, 0);
                 withProgram.createUniformBinding("u_Color")
                         .bindUniform4f(0f, 0f, 1f, 1f);
             }

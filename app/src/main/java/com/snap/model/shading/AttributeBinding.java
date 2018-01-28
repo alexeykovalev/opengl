@@ -18,13 +18,13 @@ public class AttributeBinding {
         return attributeName;
     }
 
-    public void bindFloatBuffer(
-            final FloatBuffer binaryData,
+    public void bindVertices(
+            final FloatBuffer verticesData,
             final int sizePerItem,
             final boolean isNormalized,
             final int stride) {
         GLES20.glEnableVertexAttribArray(attributeHandle);
         GLES20.glVertexAttribPointer(attributeHandle, sizePerItem, GLES20.GL_FLOAT, isNormalized,
-                stride, binaryData);
+                stride, verticesData);
     }
 }
