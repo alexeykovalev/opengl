@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.snap.coloredtriangle.ColoredTriangleRenderer;
+import com.snap.lighting.LightSceneRenderer;
 import com.snap.pointsdrawer.PointsSceneRenderer;
 
 public class OpenGlTestActivity extends AppCompatActivity {
@@ -55,7 +56,7 @@ public class OpenGlTestActivity extends AppCompatActivity {
     @NonNull
     private GLSurfaceView.Renderer createRenderer() {
 //        return new SimpleGlRenderer(getBaseContext());
-        return new LessonOneRenderer(getBaseContext());
+        return new LightSceneRenderer();
     }
 
     private boolean isSupportsEgl2() {

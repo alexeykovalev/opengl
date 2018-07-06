@@ -10,7 +10,17 @@ private const val notDefinedProgramHandle = 0
 /**
  * Represents Pair of shaders - Vertex and Fragment.
  */
-internal class ShadingProgram(private val shadingPair: ShadingPair) {
+internal class ShadingProgram(private val vertexShader: Shader,
+                              private val fragmentShader: Shader) {
+
+    init {
+        if (vertexShader.type !== ShaderType.VERTEX) {
+            throw IllegalArgumentException("First param has to be a Vertex shader.")
+        }
+        if (fragmentShader.type !== ShaderType.FRAGMENT) {
+            throw IllegalArgumentException("Second param has to be a Fragment shader.")
+        }
+    }
 
     /**
      * Handle (reference) to shading program.
@@ -22,17 +32,23 @@ internal class ShadingProgram(private val shadingPair: ShadingPair) {
 
     fun setup() {
         if (isSetup) {
-            throw GlLibException("Shading program already setup.")
+            throw GlLibException("Shading program already createAndCompile.")
         }
-        programHandle = createShadingProgram(shadingPair)
+        programHandle = createShadingProgram(vertexShader, fragmentShader)
     }
 
-    private fun createShadingProgram(shadingPair: ShadingPair): Int {
+    private fun createShadingProgram(vertexShader: Shader, fragmentShader: Shader): Int {
         val shadingProgramHandle = GLES20.glCreateProgram()
         if (shadingProgramHandle == notDefinedProgramHandle) {
             throw GlException("Could not create shading program.")
         }
-        shadingPair.setupAndAttachToProgram(shadingProgramHandle)
+
+        vertexShader.createAndCompile()
+        GLES20.glAttachShader(shadingProgramHandle, vertexShader.shaderHandle)
+
+        fragmentShader.createAndCompile()
+        GLES20.glAttachShader(shadingProgramHandle, fragmentShader.shaderHandle)
+
         GLES20.glLinkProgram(shadingProgramHandle)
         val linkStatus = IntArray(1)
         GLES20.glGetProgramiv(shadingProgramHandle, GLES20.GL_LINK_STATUS, linkStatus, 0)
@@ -41,6 +57,7 @@ internal class ShadingProgram(private val shadingPair: ShadingPair) {
             GLES20.glDeleteProgram(shadingProgramHandle)
             throw GlException("Could not link shading program. $errorMessage")
         }
+
         return shadingProgramHandle
     }
 
@@ -53,7 +70,7 @@ internal class ShadingProgram(private val shadingPair: ShadingPair) {
 
     fun useProgram() {
         if (!isSetup) {
-            throw IllegalStateException("You have to setup program before using it.")
+            throw IllegalStateException("You have to createAndCompile program before using it.")
         }
         GLES20.glUseProgram(programHandle)
     }
@@ -69,23 +86,3 @@ internal class ShadingProgram(private val shadingPair: ShadingPair) {
     fun createUniformBinding(uniformName: String, block: UniformBinding.() -> Unit = {}) =
             UniformBinding(programHandle, uniformName).apply(block)
 }
-
-data class ShadingPair(val vertexShader: Shader, val fragmentShader: Shader) {
-
-    init {
-        if (vertexShader.type !== ShaderType.VERTEX) {
-            throw IllegalArgumentException("First param has to be a Vertex shader.")
-        }
-        if (fragmentShader.type !== ShaderType.FRAGMENT) {
-            throw IllegalArgumentException("Second param has to be a Fragment shader.")
-        }
-    }
-
-    internal fun setupAndAttachToProgram(shadingProgramHandle: Int) {
-        vertexShader.setup()
-        GLES20.glAttachShader(shadingProgramHandle, vertexShader.shaderHandle)
-        fragmentShader.setup()
-        GLES20.glAttachShader(shadingProgramHandle, fragmentShader.shaderHandle)
-    }
-}
-

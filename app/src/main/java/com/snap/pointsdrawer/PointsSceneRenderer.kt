@@ -23,7 +23,6 @@ import android.opengl.GLES20.glDrawArrays
 import android.opengl.GLES20.glEnable
 import android.opengl.GLES20.glViewport
 import com.snap.model.shading.ShaderType
-import com.snap.model.shading.ShadingPair
 
 class PointsSceneRenderer : GLSurfaceView.Renderer {
 
@@ -65,11 +64,11 @@ class PointsSceneRenderer : GLSurfaceView.Renderer {
     private fun setupShadingProgram() {
         val vertexShader = Shader.fromSourceCode(ShaderType.VERTEX, VERTEX_SHADER_CODE)
         val fragmentShader = Shader.fromSourceCode(ShaderType.FRAGMENT, FRAGMENT_SHADER_CODE)
-        shadingProgram = ShadingProgram(ShadingPair(vertexShader, fragmentShader))
+        shadingProgram = ShadingProgram(vertexShader, fragmentShader)
         try {
-            shadingProgram!!.setup()
+            shadingProgram.setup()
         } catch (e: GlLibException) {
-            throw RuntimeException("Unable to setup shading program", e)
+            throw RuntimeException("Unable to createAndCompile shading program", e)
         }
 
     }

@@ -20,7 +20,6 @@ import android.opengl.GLES20.glClearColor
 import android.opengl.GLES20.glDrawArrays
 import android.opengl.GLES20.glViewport
 import com.snap.model.shading.ShaderType
-import com.snap.model.shading.ShadingPair
 
 class ColoredTriangleRenderer : GLSurfaceView.Renderer {
 
@@ -43,11 +42,11 @@ class ColoredTriangleRenderer : GLSurfaceView.Renderer {
     private fun setupShadingProgram() {
         val vertexShader = Shader.fromSourceCode(ShaderType.VERTEX, vertexShaderCode)
         val fragmentShader = Shader.fromSourceCode(ShaderType.FRAGMENT, fragmentShaderCode)
-        shadingProgram = ShadingProgram(ShadingPair(vertexShader, fragmentShader))
+        shadingProgram = ShadingProgram(vertexShader, fragmentShader)
         try {
             shadingProgram.setup()
         } catch (e: GlLibException) {
-            throw RuntimeException("Unable to setup shading program", e)
+            throw RuntimeException("Unable to createAndCompile shading program", e)
         }
 
     }

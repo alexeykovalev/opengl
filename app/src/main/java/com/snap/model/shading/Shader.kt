@@ -22,7 +22,7 @@ class Shader private constructor(val type: ShaderType, private val shaderSourceC
     var shaderHandle: Int = notDefinedHandle
         get() {
 //            if (field == notDefinedHandle) {
-//                throw IllegalStateException("You have to setup shader before getting its handle")
+//                throw IllegalStateException("You have to createAndCompile shader before getting its handle")
 //            }
             return field
         }
@@ -30,9 +30,9 @@ class Shader private constructor(val type: ShaderType, private val shaderSourceC
             field = value
         }
 
-    fun setup() {
+    fun createAndCompile() {
         if (isSetup) {
-            throw GlLibException("Shader already setup and available by [$shaderHandle] handle")
+            throw GlLibException("Shader already createAndCompile and available by [$shaderHandle] handle")
         }
         shaderHandle = createAndCompileShader(type, shaderSourceCode)
     }
@@ -57,7 +57,7 @@ class Shader private constructor(val type: ShaderType, private val shaderSourceC
 
     private fun checkIsSetup() {
         if (!isSetup) {
-            throw IllegalStateException("You have to setup shader before calling method.")
+            throw IllegalStateException("You have to createAndCompile shader before calling method.")
         }
     }
 

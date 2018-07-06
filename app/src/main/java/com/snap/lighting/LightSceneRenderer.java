@@ -171,7 +171,7 @@ public class LightSceneRenderer implements GLSurfaceView.Renderer {
     }
 
     /**
-     * Here we are going to setup Projection and Model-View-Projection matrices.
+     * Here we are going to createAndCompile Projection and Model-View-Projection matrices.
      */
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         // устанавливаем glViewport
