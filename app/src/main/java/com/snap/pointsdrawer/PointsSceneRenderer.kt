@@ -3,7 +3,6 @@ package com.snap.pointsdrawer
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 
-import com.snap.model.GlHelpers
 import com.snap.model.exception.GlLibException
 import com.snap.model.shading.Shader
 import com.snap.model.shading.ShadingProgram
@@ -22,6 +21,7 @@ import android.opengl.GLES20.glClearColor
 import android.opengl.GLES20.glDrawArrays
 import android.opengl.GLES20.glEnable
 import android.opengl.GLES20.glViewport
+import com.snap.model.createNativeFloatBuffer
 import com.snap.model.shading.ShaderType
 
 class PointsSceneRenderer : GLSurfaceView.Renderer {
@@ -49,7 +49,7 @@ class PointsSceneRenderer : GLSurfaceView.Renderer {
         val vertices = floatArrayOf(-0.7f, -0.5f, z1, 0.3f, -0.5f, z1, -0.2f, 0.3f, z1,
 
                 -0.3f, -0.4f, z2, 0.7f, -0.4f, z2, 0.2f, 0.4f, z2)
-        verticesBuffer = GlHelpers.createNativeFloatBuffer(vertices)
+        verticesBuffer = createNativeFloatBuffer(vertices)
     }
 
     private fun setupColorsBuffer() {
@@ -58,7 +58,7 @@ class PointsSceneRenderer : GLSurfaceView.Renderer {
                 0.0f, 1.0f, 0.0f, 1f, 0.0f, 1.0f, 0.0f, 1f, 0.0f, 1.0f, 0.0f, 1f,
 
                 0.0f, 0.0f, 1.0f, 1f, 0.0f, 0.0f, 1.0f, 1f, 0.0f, 0.0f, 1.0f, 1f)
-        colorsBuffer = GlHelpers.createNativeFloatBuffer(colors)
+        colorsBuffer = createNativeFloatBuffer(colors)
     }
 
     private fun setupShadingProgram() {

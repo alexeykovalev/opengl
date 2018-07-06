@@ -2,7 +2,6 @@ package com.snap.coloredtriangle
 
 import android.opengl.GLSurfaceView
 
-import com.snap.model.GlHelpers
 import com.snap.model.exception.GlLibException
 import com.snap.model.shading.Shader
 import com.snap.model.shading.ShadingProgram
@@ -19,6 +18,7 @@ import android.opengl.GLES20.glClear
 import android.opengl.GLES20.glClearColor
 import android.opengl.GLES20.glDrawArrays
 import android.opengl.GLES20.glViewport
+import com.snap.model.createNativeFloatBuffer
 import com.snap.model.shading.ShaderType
 
 class ColoredTriangleRenderer : GLSurfaceView.Renderer {
@@ -35,7 +35,7 @@ class ColoredTriangleRenderer : GLSurfaceView.Renderer {
     private fun setupVertices() {
         val firstTriangle = floatArrayOf(-0.5f, -0.2f, 0f, 0f, 0.2f, 0f, 0.5f, -0.2f, 0f)
         val secondTriangle = floatArrayOf(-0.5f, -0.2f, 0f, 0.5f, -0.2f, 0f, 0f, -0.6f, 0f)
-        triangles.add(GlHelpers.createNativeFloatBuffer(firstTriangle))
+        triangles.add(createNativeFloatBuffer(firstTriangle))
         //        triangles.add(GlHelpers.createNativeFloatBuffer(secondTriangle));
     }
 
@@ -68,9 +68,8 @@ class ColoredTriangleRenderer : GLSurfaceView.Renderer {
 
     override fun onDrawFrame(ignore: GL10) {
         glClear(GL_COLOR_BUFFER_BIT)
-        for (triangleVertices in triangles) {
-            drawTriangle(triangleVertices)
-        }
+        triangles.forEach { drawTriangle(it) }
+
     }
 
     private fun drawTriangle(triangleVertices: FloatBuffer) {
