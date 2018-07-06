@@ -201,11 +201,11 @@ public class LightSceneRenderer implements GLSurfaceView.Renderer {
         //включаем сглаживание текстур, это пригодится в будущем
         GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_NICEST);
 
-        mSeaShader = LightSceneShadingProgram.newInstance();
-        mSkyShader = LightSceneShadingProgram.newInstance();
-        mMainSailShader = LightSceneShadingProgram.newInstance();
-        mSmallSailShader = LightSceneShadingProgram.newInstance();
-        mBoatShader = LightSceneShadingProgram.newInstance();
+        mSeaShader = LightSceneShadingProgram.Companion.newInstance();
+        mSkyShader = LightSceneShadingProgram.Companion.newInstance();
+        mMainSailShader = LightSceneShadingProgram.Companion.newInstance();
+        mSmallSailShader = LightSceneShadingProgram.Companion.newInstance();
+        mBoatShader = LightSceneShadingProgram.Companion.newInstance();
 
         try {
             mSeaShader.setup();
