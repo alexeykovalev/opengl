@@ -75,7 +75,7 @@ internal class ShadingProgram(private val vertexShader: Shader,
         GLES20.glUseProgram(programHandle)
     }
 
-    fun executeUsingProgram(block: ShadingProgram.() -> Unit) = apply {
+    fun doUsingProgram(block: ShadingProgram.() -> Unit) = apply {
         useProgram()
         block()
     }

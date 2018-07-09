@@ -15,7 +15,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
     }
 
     fun linkVertexBuffer(vertexBuffer: FloatBuffer) {
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createAttributeBinding("a_vertex") {
                 bindFloatBuffer(vertexBuffer, 3, false, 0)
             }
@@ -23,7 +23,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
     }
 
     fun linkNormalBuffer(normalBuffer: FloatBuffer) {
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createAttributeBinding("a_normal") {
                 bindFloatBuffer(normalBuffer, 3, false, 0)
             }
@@ -31,7 +31,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
     }
 
     fun linkColorBuffer(colorBuffer: FloatBuffer) {
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createAttributeBinding("a_color") {
                 bindFloatBuffer(colorBuffer, 4, false, 0)
             }
@@ -39,7 +39,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
     }
 
     fun linkModelViewProjectionMatrix(modelViewProjectionMatrix: FloatArray) {
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createUniformBinding("u_modelViewProjectionMatrix") {
                 bindUniformMatrix4fv(modelViewProjectionMatrix)
             }
@@ -47,7 +47,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
     }
 
     fun linkCamera(xCamera: Float, yCamera: Float, zCamera: Float) {
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createUniformBinding("u_camera") {
                 bindUniform3f(xCamera, yCamera, zCamera)
             }
@@ -55,7 +55,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
     }
 
     fun linkLightSource(xLightPosition: Float, yLightPosition: Float, zLightPosition: Float) {
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createUniformBinding("u_lightPosition") {
                 bindUniform3f(xLightPosition, yLightPosition, zLightPosition)
             }

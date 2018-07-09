@@ -52,7 +52,7 @@ class ColoredTriangleRenderer : GLSurfaceView.Renderer {
     }
 
     private fun bindData(triangleVertices: FloatBuffer) {
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createAttributeBinding("a_Position") {
                 bindFloatBuffer(triangleVertices, 3, false, 0)
             }

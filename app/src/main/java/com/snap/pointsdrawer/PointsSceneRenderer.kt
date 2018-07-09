@@ -87,7 +87,7 @@ class PointsSceneRenderer : GLSurfaceView.Renderer {
     }
 
     private fun bindVertices(verticesData: FloatBuffer?) {
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createAttributeBinding("a_Position") {
                 bindFloatBuffer(verticesData!!, 3, false, 0)
             }
@@ -95,7 +95,7 @@ class PointsSceneRenderer : GLSurfaceView.Renderer {
     }
 
     private fun bindColors(colorsBuffer: FloatBuffer?) {
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createAttributeBinding("a_Color") {
                 bindFloatBuffer(colorsBuffer!!, 4, false, 0)
             }
@@ -123,7 +123,7 @@ class PointsSceneRenderer : GLSurfaceView.Renderer {
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far)
 
-        shadingProgram.executeUsingProgram {
+        shadingProgram.doUsingProgram {
             createUniformBinding("u_Matrix") {
                 bindUniformMatrix4fv(mProjectionMatrix)
             }

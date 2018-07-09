@@ -111,7 +111,10 @@ class LightSceneRenderer : GLSurfaceView.Renderer {
         val nz = 1f
         //нормаль одинакова для всех вершин квадрата,
         //поэтому переписываем координаты вектора нормали в массив 4 раза
-        val normalArray = floatArrayOf(nx, ny, nz, nx, ny, nz, nx, ny, nz, nx, ny, nz)
+        val normalArray = floatArrayOf(nx, ny, nz,
+                nx, ny, nz,
+                nx, ny, nz,
+                nx, ny, nz)
         verticesNormalsBuffer = createNativeFloatBuffer(normalArray)
     }
 
@@ -175,27 +178,37 @@ class LightSceneRenderer : GLSurfaceView.Renderer {
 
         // Render Sea
         linkAttributesAndUniforms(seaShader,
-                seaVerticesBuffer, verticesNormalsBuffer, seaVerticesColorsBuffer)
+                seaVerticesBuffer,
+                verticesNormalsBuffer,
+                seaVerticesColorsBuffer)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, bytesPerFloat)
 
         // Render Sky
         linkAttributesAndUniforms(skyShader,
-                skyVerticesBuffer, verticesNormalsBuffer, skyVerticesColorsBuffer)
+                skyVerticesBuffer,
+                verticesNormalsBuffer,
+                skyVerticesColorsBuffer)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, bytesPerFloat)
 
         // Render MainSail
         linkAttributesAndUniforms(mainSailShader,
-                mainSailVerticesBuffer, verticesNormalsBuffer, anySailVerticesColorsBuffer)
+                mainSailVerticesBuffer,
+                verticesNormalsBuffer,
+                anySailVerticesColorsBuffer)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3)
 
         // Render SmallSail
         linkAttributesAndUniforms(smallSailShader,
-                smallSailVerticesBuffer, verticesNormalsBuffer, anySailVerticesColorsBuffer)
+                smallSailVerticesBuffer,
+                verticesNormalsBuffer,
+                anySailVerticesColorsBuffer)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3)
 
         // Render Boat
         linkAttributesAndUniforms(boatShader,
-                boatVerticesBuffer, verticesNormalsBuffer, boatVerticesColorsBuffer)
+                boatVerticesBuffer,
+                verticesNormalsBuffer,
+                boatVerticesColorsBuffer)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, bytesPerFloat)
     }
 
