@@ -69,7 +69,6 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
                     Shader.fromSourceCode(ShaderType.VERTEX, vertexShaderCode),
                     Shader.fromSourceCode(ShaderType.FRAGMENT, fragmentShaderCode)))
         }
-
     }
 }
 
@@ -85,8 +84,7 @@ private const val vertexShaderCode = "uniform mat4 u_modelViewProjectionMatrix;"
 
         "void main() {" +
         "v_vertex = a_vertex;" +
-        "vec3 n_normal = normalize(a_normal);" +
-        "v_normal = n_normal;" +
+        "v_normal = normalize(a_normal);;" +
         "v_color = a_color;" +
         "gl_Position = u_modelViewProjectionMatrix * vec4(a_vertex, 1.0);" +
         "}"
