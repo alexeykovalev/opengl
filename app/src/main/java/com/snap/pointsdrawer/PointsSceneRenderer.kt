@@ -86,18 +86,18 @@ class PointsSceneRenderer : GLSurfaceView.Renderer {
         glDrawArrays(GL_TRIANGLES, 0, 6)
     }
 
-    private fun bindVertices(verticesData: FloatBuffer?) {
+    private fun bindVertices(verticesData: FloatBuffer) {
         shadingProgram.doUsingProgram {
             createAttributeBinding("a_Position") {
-                bindFloatBuffer(verticesData!!, 3, false, 0)
+                bindFloatBuffer(verticesData, 3)
             }
         }
     }
 
-    private fun bindColors(colorsBuffer: FloatBuffer?) {
+    private fun bindColors(colorsBuffer: FloatBuffer) {
         shadingProgram.doUsingProgram {
             createAttributeBinding("a_Color") {
-                bindFloatBuffer(colorsBuffer!!, 4, false, 0)
+                bindFloatBuffer(colorsBuffer, 4)
             }
         }
     }

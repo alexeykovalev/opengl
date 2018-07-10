@@ -17,7 +17,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
     fun linkVertexBuffer(vertexBuffer: FloatBuffer) {
         shadingProgram.doUsingProgram {
             createAttributeBinding("a_vertex") {
-                bindFloatBuffer(vertexBuffer, 3, false, 0)
+                bindFloatBuffer(vertexBuffer, 3)
             }
         }
     }
@@ -25,7 +25,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
     fun linkNormalBuffer(normalBuffer: FloatBuffer) {
         shadingProgram.doUsingProgram {
             createAttributeBinding("a_normal") {
-                bindFloatBuffer(normalBuffer, 3, false, 0)
+                bindFloatBuffer(normalBuffer, 3)
             }
         }
     }
@@ -33,7 +33,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
     fun linkColorBuffer(colorBuffer: FloatBuffer) {
         shadingProgram.doUsingProgram {
             createAttributeBinding("a_color") {
-                bindFloatBuffer(colorBuffer, 4, false, 0)
+                bindFloatBuffer(colorBuffer, 4)
             }
         }
     }
@@ -107,7 +107,9 @@ private const val fragmentShaderCode = "precision mediump float;" +
         "float k_specular = 0.0; /*0.5*/" +
         "float diffuse = k_diffuse * max(dot(n_normal, lightvector), 0.0);" +
         "vec3 reflectvector = reflect(-lightvector, n_normal);" +
-        "float specular = k_specular * pow(max(dot(lookvector,reflectvector),0.0), 40.0 );" +
+        "float lookReflectDiff = max(dot(lookvector, reflectvector), 0.0);" +
+        "float k_shine = 40.0;" +
+        "float specular = k_specular * pow(lookReflectDiff, k_shine);" +
         "vec4 one = vec4(1.0, 1.0, 1.0, 1.0);" +
         "vec4 lightColor = (ambient + diffuse + specular)*one;" +
         "gl_FragColor = mix(lightColor, v_color, 0.0);" +

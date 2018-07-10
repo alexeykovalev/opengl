@@ -11,8 +11,8 @@ class AttributeBinding(programHandle: Int, val attributeName: String) {
     fun bindFloatBuffer(
             floatBuffer: FloatBuffer,
             sizePerItem: Int,
-            isNormalized: Boolean,
-            stride: Int) {
+            isNormalized: Boolean = false,
+            stride: Int = 0) {
         GLES20.glEnableVertexAttribArray(attributeHandle)
         GLES20.glVertexAttribPointer(attributeHandle, sizePerItem, GLES20.GL_FLOAT, isNormalized,
                 stride, floatBuffer)

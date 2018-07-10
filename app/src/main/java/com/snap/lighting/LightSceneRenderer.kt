@@ -90,11 +90,32 @@ class LightSceneRenderer : GLSurfaceView.Renderer {
     }
 
     private fun setupVertexBuffers() {
-        val seaVertices = floatArrayOf(-1.0f, -0.35f, 0.0f, -1.0f, -1.5f, 0.0f, 1.0f, -0.35f, 0.0f, 1.0f, -1.5f, 0.0f)
-        val skyVertices = floatArrayOf(-1.0f, 1.5f, 0.0f, -1.0f, -0.35f, 0.0f, 1.0f, 1.5f, 0.0f, 1.0f, -0.35f, 0f)
-        val mainSailVertices = floatArrayOf(-0.5f, -0.45f, 0.4f, 0.0f, -0.45f, 0.4f, 0.0f, 0.5f, 0.4f)
-        val smallSailVertices = floatArrayOf(0.05f, -0.45f, 0.4f, 0.22f, -0.5f, 0.4f, 0.0f, 0.25f, 0.4f)
-        val boatVertices = floatArrayOf(-0.5f, -0.5f, 0.4f, -0.5f, -0.6f, 0.4f, 0.22f, -0.5f, 0.4f, 0.18f, -0.6f, 0.4f)
+        val zEnvironment = 0.0f
+        val seaVertices = floatArrayOf(
+                -1.0f, -0.35f, zEnvironment,
+                -1.0f, -1.5f, zEnvironment,
+                1.0f, -0.35f, zEnvironment,
+                1.0f, -1.5f, zEnvironment)
+        val skyVertices = floatArrayOf(
+                -1.0f, 1.5f, zEnvironment,
+                -1.0f, -0.35f, zEnvironment,
+                1.0f, 1.5f, zEnvironment,
+                1.0f, -0.35f, zEnvironment)
+
+        val zShip = 0.4f
+        val mainSailVertices = floatArrayOf(
+                -0.5f, -0.45f, zShip,
+                0.0f, -0.45f, zShip,
+                0.0f, 0.5f, zShip)
+        val smallSailVertices = floatArrayOf(
+                0.05f, -0.45f, zShip,
+                0.22f, -0.5f, zShip,
+                0.0f, 0.25f, zShip)
+        val boatVertices = floatArrayOf(
+                -0.5f, -0.5f, zShip,
+                -0.5f, -0.6f, zShip,
+                0.22f, -0.5f, zShip,
+                0.18f, -0.6f, zShip)
 
         seaVerticesBuffer = createNativeFloatBuffer(seaVertices)
         skyVerticesBuffer = createNativeFloatBuffer(skyVertices)
@@ -120,10 +141,25 @@ class LightSceneRenderer : GLSurfaceView.Renderer {
 
     private fun setupVerticesColorBuffers() {
         // R-G-B-A
-        val seaVerticesColors = floatArrayOf(0f, 1f, 1f, 1f, 0f, 0f, 1f, 1f, 0f, 1f, 1f, 1f, 0f, 0f, 1f, 1f)
-        val skyVerticesColors = floatArrayOf(0.2f, 0.2f, 0.8f, 1f, 0.5f, 0.5f, 1f, 1f, 0.2f, 0.2f, 0.8f, 1f, 0.5f, 0.5f, 1f, 1f)
-        val sailVerticesColors = floatArrayOf(1f, 0.1f, 0.1f, 1f, 1f, 1f, 1f, 1f, 1f, 0.1f, 0.1f, 1f)
-        val boatVerticesColors = floatArrayOf(1f, 1f, 1f, 1f, 0.2f, 0.2f, 0.2f, 1f, 1f, 1f, 1f, 1f, 0.2f, 0.2f, 0.2f, 1f)
+        val seaVerticesColors = floatArrayOf(
+                0f, 1f, 1f, 1f,
+                0f, 0f, 1f, 1f,
+                0f, 1f, 1f, 1f,
+                0f, 0f, 1f, 1f)
+        val skyVerticesColors = floatArrayOf(
+                0.2f, 0.2f, 0.8f, 1f,
+                0.5f, 0.5f, 1f, 1f,
+                0.2f, 0.2f, 0.8f, 1f,
+                0.5f, 0.5f, 1f, 1f)
+        val sailVerticesColors = floatArrayOf(
+                1f, 0.1f, 0.1f, 1f,
+                1f, 1f, 1f, 1f,
+                1f, 0.1f, 0.1f, 1f)
+        val boatVerticesColors = floatArrayOf(
+                1f, 1f, 1f, 1f,
+                0.2f, 0.2f, 0.2f, 1f,
+                1f, 1f, 1f, 1f,
+                0.2f, 0.2f, 0.2f, 1f)
         seaVerticesColorsBuffer = createNativeFloatBuffer(seaVerticesColors)
         skyVerticesColorsBuffer = createNativeFloatBuffer(skyVerticesColors)
         anySailVerticesColorsBuffer = createNativeFloatBuffer(sailVerticesColors)
@@ -181,14 +217,14 @@ class LightSceneRenderer : GLSurfaceView.Renderer {
                 seaVerticesBuffer,
                 verticesNormalsBuffer,
                 seaVerticesColorsBuffer)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, bytesPerFloat)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 
         // Render Sky
         linkAttributesAndUniforms(skyShader,
                 skyVerticesBuffer,
                 verticesNormalsBuffer,
                 skyVerticesColorsBuffer)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, bytesPerFloat)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 
         // Render MainSail
         linkAttributesAndUniforms(mainSailShader,
@@ -209,7 +245,7 @@ class LightSceneRenderer : GLSurfaceView.Renderer {
                 boatVerticesBuffer,
                 verticesNormalsBuffer,
                 boatVerticesColorsBuffer)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, bytesPerFloat)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
     }
 
     private fun linkAttributesAndUniforms(shadingProgram: LightSceneShadingProgram,
