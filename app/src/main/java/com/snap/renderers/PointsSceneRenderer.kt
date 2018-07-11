@@ -21,8 +21,8 @@ import android.opengl.GLES20.glClearColor
 import android.opengl.GLES20.glDrawArrays
 import android.opengl.GLES20.glEnable
 import android.opengl.GLES20.glViewport
-import com.snap.model.createNativeFloatBuffer
 import com.snap.model.shading.ShaderType
+import com.snap.model.toNativeOrderBuffer
 
 class PointsSceneRenderer : GLSurfaceView.Renderer {
 
@@ -46,19 +46,17 @@ class PointsSceneRenderer : GLSurfaceView.Renderer {
         val z1 = -1.0f
         val z2 = -1.0f
 
-        val vertices = floatArrayOf(-0.7f, -0.5f, z1, 0.3f, -0.5f, z1, -0.2f, 0.3f, z1,
-
-                -0.3f, -0.4f, z2, 0.7f, -0.4f, z2, 0.2f, 0.4f, z2)
-        verticesBuffer = createNativeFloatBuffer(vertices)
+        verticesBuffer = floatArrayOf(-0.7f, -0.5f, z1, 0.3f, -0.5f, z1, -0.2f, 0.3f, z1,
+                -0.3f, -0.4f, z2, 0.7f, -0.4f, z2, 0.2f, 0.4f, z2
+        ).toNativeOrderBuffer()
     }
 
     private fun setupColorsBuffer() {
-        val colors = floatArrayOf(
+        colorsBuffer = floatArrayOf(
                 // R G B A
                 0.0f, 1.0f, 0.0f, 1f, 0.0f, 1.0f, 0.0f, 1f, 0.0f, 1.0f, 0.0f, 1f,
-
-                0.0f, 0.0f, 1.0f, 1f, 0.0f, 0.0f, 1.0f, 1f, 0.0f, 0.0f, 1.0f, 1f)
-        colorsBuffer = createNativeFloatBuffer(colors)
+                0.0f, 0.0f, 1.0f, 1f, 0.0f, 0.0f, 1.0f, 1f, 0.0f, 0.0f, 1.0f, 1f
+        ).toNativeOrderBuffer()
     }
 
     private fun setupShadingProgram() {

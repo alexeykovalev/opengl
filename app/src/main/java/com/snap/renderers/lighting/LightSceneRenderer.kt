@@ -10,7 +10,7 @@ import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-import com.snap.model.createNativeFloatBuffer
+import com.snap.model.toNativeOrderBuffer
 
 class LightSceneRenderer : GLSurfaceView.Renderer {
 
@@ -90,37 +90,36 @@ class LightSceneRenderer : GLSurfaceView.Renderer {
 
     private fun setupVertexBuffers() {
         val zEnvironment = 0.0f
-        val seaVertices = floatArrayOf(
+
+        val zShip = 0.4f
+
+        seaVerticesBuffer = floatArrayOf(
                 -1.0f, -0.35f, zEnvironment,
                 -1.0f, -1.5f, zEnvironment,
                 1.0f, -0.35f, zEnvironment,
-                1.0f, -1.5f, zEnvironment)
-        val skyVertices = floatArrayOf(
+                1.0f, -1.5f, zEnvironment).toNativeOrderBuffer()
+
+        skyVerticesBuffer = floatArrayOf(
                 -1.0f, 1.5f, zEnvironment,
                 -1.0f, -0.35f, zEnvironment,
                 1.0f, 1.5f, zEnvironment,
-                1.0f, -0.35f, zEnvironment)
+                1.0f, -0.35f, zEnvironment).toNativeOrderBuffer()
 
-        val zShip = 0.4f
-        val mainSailVertices = floatArrayOf(
+        mainSailVerticesBuffer = floatArrayOf(
                 -0.5f, -0.45f, zShip,
                 0.0f, -0.45f, zShip,
-                0.0f, 0.5f, zShip)
-        val smallSailVertices = floatArrayOf(
+                0.0f, 0.5f, zShip).toNativeOrderBuffer()
+
+        smallSailVerticesBuffer = floatArrayOf(
                 0.05f, -0.45f, zShip,
                 0.22f, -0.5f, zShip,
-                0.0f, 0.25f, zShip)
-        val boatVertices = floatArrayOf(
+                0.0f, 0.25f, zShip).toNativeOrderBuffer()
+
+        boatVerticesBuffer = floatArrayOf(
                 -0.5f, -0.5f, zShip,
                 -0.5f, -0.6f, zShip,
                 0.22f, -0.5f, zShip,
-                0.18f, -0.6f, zShip)
-
-        seaVerticesBuffer = createNativeFloatBuffer(seaVertices)
-        skyVerticesBuffer = createNativeFloatBuffer(skyVertices)
-        mainSailVerticesBuffer = createNativeFloatBuffer(mainSailVertices)
-        smallSailVerticesBuffer = createNativeFloatBuffer(smallSailVertices)
-        boatVerticesBuffer = createNativeFloatBuffer(boatVertices)
+                0.18f, -0.6f, zShip).toNativeOrderBuffer()
     }
 
     private fun setupNormalsBuffer() {
@@ -131,38 +130,35 @@ class LightSceneRenderer : GLSurfaceView.Renderer {
         val nz = 1f
         //нормаль одинакова для всех вершин квадрата,
         //поэтому переписываем координаты вектора нормали в массив 4 раза
-        val normalArray = floatArrayOf(nx, ny, nz,
+        verticesNormalsBuffer = floatArrayOf(
                 nx, ny, nz,
                 nx, ny, nz,
-                nx, ny, nz)
-        verticesNormalsBuffer = createNativeFloatBuffer(normalArray)
+                nx, ny, nz,
+                nx, ny, nz
+        ).toNativeOrderBuffer()
     }
 
     private fun setupVerticesColorBuffers() {
         // R-G-B-A
-        val seaVerticesColors = floatArrayOf(
+        seaVerticesColorsBuffer = floatArrayOf(
                 0f, 1f, 1f, 1f,
                 0f, 0f, 1f, 1f,
                 0f, 1f, 1f, 1f,
-                0f, 0f, 1f, 1f)
-        val skyVerticesColors = floatArrayOf(
+                0f, 0f, 1f, 1f).toNativeOrderBuffer()
+        skyVerticesColorsBuffer = floatArrayOf(
                 0.2f, 0.2f, 0.8f, 1f,
                 0.5f, 0.5f, 1f, 1f,
                 0.2f, 0.2f, 0.8f, 1f,
-                0.5f, 0.5f, 1f, 1f)
-        val sailVerticesColors = floatArrayOf(
+                0.5f, 0.5f, 1f, 1f).toNativeOrderBuffer()
+        anySailVerticesColorsBuffer = floatArrayOf(
                 1f, 0.1f, 0.1f, 1f,
                 1f, 1f, 1f, 1f,
-                1f, 0.1f, 0.1f, 1f)
-        val boatVerticesColors = floatArrayOf(
+                1f, 0.1f, 0.1f, 1f).toNativeOrderBuffer()
+        boatVerticesColorsBuffer = floatArrayOf(
                 1f, 1f, 1f, 1f,
                 0.2f, 0.2f, 0.2f, 1f,
                 1f, 1f, 1f, 1f,
-                0.2f, 0.2f, 0.2f, 1f)
-        seaVerticesColorsBuffer = createNativeFloatBuffer(seaVerticesColors)
-        skyVerticesColorsBuffer = createNativeFloatBuffer(skyVerticesColors)
-        anySailVerticesColorsBuffer = createNativeFloatBuffer(sailVerticesColors)
-        boatVerticesColorsBuffer = createNativeFloatBuffer(boatVerticesColors)
+                0.2f, 0.2f, 0.2f, 1f).toNativeOrderBuffer()
     }
 
     /**

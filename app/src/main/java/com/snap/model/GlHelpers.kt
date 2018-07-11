@@ -6,7 +6,7 @@ import java.nio.FloatBuffer
 
 const val bytesPerFloat = 4
 
-fun createNativeFloatBuffer(ofArray: FloatArray): FloatBuffer {
+private fun createNativeOrderFloatBuffer(ofArray: FloatArray): FloatBuffer {
     if (ofArray.isEmpty()) {
         throw IllegalArgumentException("Array has to be not empty.")
     }
@@ -17,3 +17,5 @@ fun createNativeFloatBuffer(ofArray: FloatArray): FloatBuffer {
     result.position(0)
     return result
 }
+
+fun FloatArray.toNativeOrderBuffer(): FloatBuffer = createNativeOrderFloatBuffer(this)

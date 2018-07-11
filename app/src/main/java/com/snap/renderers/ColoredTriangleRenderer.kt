@@ -18,8 +18,8 @@ import android.opengl.GLES20.glClear
 import android.opengl.GLES20.glClearColor
 import android.opengl.GLES20.glDrawArrays
 import android.opengl.GLES20.glViewport
-import com.snap.model.createNativeFloatBuffer
 import com.snap.model.shading.ShaderType
+import com.snap.model.toNativeOrderBuffer
 
 class ColoredTriangleRenderer : GLSurfaceView.Renderer {
 
@@ -35,8 +35,8 @@ class ColoredTriangleRenderer : GLSurfaceView.Renderer {
     private fun setupVertices() {
         val firstTriangle = floatArrayOf(-0.5f, -0.2f, 0f, 0f, 0.2f, 0f, 0.5f, -0.2f, 0f)
         val secondTriangle = floatArrayOf(-0.5f, -0.2f, 0f, 0.5f, -0.2f, 0f, 0f, -0.6f, 0f)
-        triangles.add(createNativeFloatBuffer(firstTriangle))
-        //        triangles.add(GlHelpers.createNativeFloatBuffer(secondTriangle));
+        triangles.add(firstTriangle.toNativeOrderBuffer())
+        //        triangles.add(GlHelpers.createNativeOrderFloatBuffer(secondTriangle));
     }
 
     private fun setupShadingProgram() {
