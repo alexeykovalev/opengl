@@ -1,4 +1,4 @@
-package com.snap.renderers.pointsdrawer
+package com.snap.renderers
 
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix

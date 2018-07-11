@@ -1,4 +1,4 @@
-package com.snap.renderers.coloredtriangle
+package com.snap.renderers
 
 import android.opengl.GLSurfaceView
 
