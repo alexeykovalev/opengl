@@ -6,7 +6,7 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import com.snap.lighting.LightSceneRenderer
+import com.snap.renderers.lighting.LightSceneRenderer
 
 class OpenGlTestActivity : AppCompatActivity() {
 

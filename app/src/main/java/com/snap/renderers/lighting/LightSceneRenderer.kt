@@ -1,4 +1,4 @@
-package com.snap.lighting
+package com.snap.renderers.lighting
 
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
@@ -10,7 +10,6 @@ import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-import com.snap.model.bytesPerFloat
 import com.snap.model.createNativeFloatBuffer
 
 class LightSceneRenderer : GLSurfaceView.Renderer {

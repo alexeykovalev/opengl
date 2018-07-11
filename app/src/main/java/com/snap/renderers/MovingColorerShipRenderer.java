@@ -1,4 +1,4 @@
-package com.snap;
+package com.snap.renderers;
 
 
 import android.content.Context;
@@ -17,7 +17,7 @@ import javax.microedition.khronos.opengles.GL10;
  * This class implements our custom renderer. Note that the GL10 parameter passed in is unused for OpenGL ES 2.0
  * renderers -- the static class GLES20 is used instead.
  */
-public class LessonOneRenderer implements GLSurfaceView.Renderer {
+public class MovingColorerShipRenderer implements GLSurfaceView.Renderer {
 
     /**
      * Store the model matrix. This matrix is used to move models from object space (where each model can be thought
@@ -85,7 +85,7 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
     /**
      * Initialize the model data.
      */
-    public LessonOneRenderer(Context context) {
+    public MovingColorerShipRenderer(Context context) {
         this.context = context;
 
         // This triangle is white_blue.First sail is mainsail

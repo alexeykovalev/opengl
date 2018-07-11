@@ -1,4 +1,4 @@
-package com.snap.lighting
+package com.snap.renderers.lighting
 
 import com.snap.model.exception.GlLibException
 import com.snap.model.shading.Shader

@@ -1,4 +1,4 @@
-package com.snap;
+package com.snap.renderers;
 
 import static android.opengl.GLES10.*;
 
@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.util.Log;
+
+import com.snap.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
