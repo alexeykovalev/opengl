@@ -20,12 +20,13 @@ class AttributeBinding(programHandle: Int, attributeName: String) {
             sizePerItem: Int,
             isNormalized: Boolean = false,
             stride: Int = 0) {
-        enableVertexAttribute()
+        GLES20.glEnableVertexAttribArray(attributeHandle)
         GLES20.glVertexAttribPointer(attributeHandle, sizePerItem, GLES20.GL_FLOAT, isNormalized,
                 stride, floatBuffer)
     }
 
-    private fun enableVertexAttribute() {
-        GLES20.glEnableVertexAttribArray(attributeHandle)
+    fun bind4f(first: Float, second: Float, third: Float, fourth: Float) {
+        GLES20.glVertexAttrib4f(attributeHandle, first, second, third, fourth)
     }
+
 }

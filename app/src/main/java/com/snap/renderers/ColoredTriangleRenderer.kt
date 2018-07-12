@@ -44,7 +44,7 @@ class ColoredTriangleRenderer : GLSurfaceView.Renderer {
         val fragmentShader = Shader.fromSourceCode(ShaderType.FRAGMENT, fragmentShaderCode)
         shadingProgram = ShadingProgram(vertexShader, fragmentShader)
         try {
-            shadingProgram.setup()
+            shadingProgram.compile()
         } catch (e: GlLibException) {
             throw RuntimeException("Unable to createAndCompile shading program", e)
         }

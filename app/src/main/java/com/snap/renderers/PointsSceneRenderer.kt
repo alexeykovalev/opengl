@@ -64,7 +64,7 @@ class PointsSceneRenderer : GLSurfaceView.Renderer {
         val fragmentShader = Shader.fromSourceCode(ShaderType.FRAGMENT, FRAGMENT_SHADER_CODE)
         shadingProgram = ShadingProgram(vertexShader, fragmentShader)
         try {
-            shadingProgram.setup()
+            shadingProgram.compile()
         } catch (e: GlLibException) {
             throw RuntimeException("Unable to createAndCompile shading program", e)
         }

@@ -6,12 +6,16 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import com.snap.renderers.lighting.LightSceneRenderer
+import com.snap.renderers.PlaygroundRenderer
 
 class OpenGlTestActivity : AppCompatActivity() {
 
     private lateinit var glSurfaceView: GLSurfaceView
     private var isRendererSet: Boolean = false
+
+    private val renderer: GLSurfaceView.Renderer by lazy {
+        PlaygroundRenderer()
+    }
 
     private val isSupportsEgl2: Boolean
         get() {
@@ -45,16 +49,11 @@ class OpenGlTestActivity : AppCompatActivity() {
     private fun setupSurfaceView() {
         if (isSupportsEgl2) {
             glSurfaceView.setEGLContextClientVersion(2)
-            glSurfaceView.setRenderer(createRenderer())
+            glSurfaceView.setRenderer(renderer)
             glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
             isRendererSet = true
         } else {
             Toast.makeText(this, "OpenGl does not supported", Toast.LENGTH_LONG).show()
         }
-    }
-
-    private fun createRenderer(): GLSurfaceView.Renderer {
-        //        return new SimpleGlRenderer(getBaseContext());
-        return LightSceneRenderer()
     }
 }

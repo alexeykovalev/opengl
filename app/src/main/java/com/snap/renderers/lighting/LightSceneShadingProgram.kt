@@ -11,7 +11,7 @@ internal class LightSceneShadingProgram private constructor(private val shadingP
 
     @Throws(GlLibException::class)
     fun setup() {
-        shadingProgram.setup()
+        shadingProgram.compile()
     }
 
     fun linkVertexBuffer(vertexBuffer: FloatBuffer) {

@@ -30,14 +30,14 @@ internal class ShadingProgram(private val vertexShader: Shader,
     val isSetup: Boolean
         get() = programHandle != notDefinedProgramHandle
 
-    fun setup() {
+    fun compile() = apply {
         if (isSetup) {
             throw GlLibException("Shading program already createAndCompile.")
         }
-        programHandle = createShadingProgram(vertexShader, fragmentShader)
+        programHandle = createGlShadingProgram(vertexShader, fragmentShader)
     }
 
-    private fun createShadingProgram(vertexShader: Shader, fragmentShader: Shader): Int {
+    private fun createGlShadingProgram(vertexShader: Shader, fragmentShader: Shader): Int {
         val shadingProgramHandle = GLES20.glCreateProgram()
         if (shadingProgramHandle == notDefinedProgramHandle) {
             throw GlException("Could not create shading program.")
