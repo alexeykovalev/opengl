@@ -6,7 +6,7 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import com.snap.renderers.PlaygroundRenderer
+import com.snap.renderers.RotatingTrianglesRenderer
 
 class OpenGlTestActivity : AppCompatActivity() {
 
@@ -14,7 +14,7 @@ class OpenGlTestActivity : AppCompatActivity() {
     private var isRendererSet: Boolean = false
 
     private val renderer: GLSurfaceView.Renderer by lazy {
-        PlaygroundRenderer()
+        RotatingTrianglesRenderer()
     }
 
     private val isSupportsEgl2: Boolean
